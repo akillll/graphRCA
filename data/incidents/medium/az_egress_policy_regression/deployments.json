@@ -1,0 +1,32 @@
+[
+  {
+    "deployment_id": "node-rotate-1c-100",
+    "timestamp": "2026-02-27T08:05:00Z",
+    "service": "cluster-autoscaler",
+    "environment": "production",
+    "version": "app-general-us-east-1c-patched-ami",
+    "strategy": "node-rotation",
+    "status": "started",
+    "initiated_by": "platform-ops"
+  },
+  {
+    "deployment_id": "auth-netpol-7701",
+    "timestamp": "2026-02-27T08:17:24Z",
+    "service": "auth-network-policy",
+    "environment": "production",
+    "version": "2026.02.27.1",
+    "strategy": "rolling",
+    "status": "completed",
+    "initiated_by": "argo-rollouts"
+  },
+  {
+    "deployment_id": "auth-netpol-7702",
+    "timestamp": "2026-02-27T08:51:13Z",
+    "service": "auth-network-policy",
+    "environment": "production",
+    "version": "2026.02.26.9",
+    "strategy": "rollback",
+    "status": "completed",
+    "initiated_by": "incident-commander"
+  }
+]

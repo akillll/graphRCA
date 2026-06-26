@@ -1,0 +1,32 @@
+[
+  {
+    "deployment_id": "inventory-maint-11b",
+    "timestamp": "2026-03-07T19:09:00Z",
+    "service": "inventory-platform",
+    "environment": "production",
+    "version": "kernel-patch-window",
+    "strategy": "maintenance-operation",
+    "status": "started",
+    "initiated_by": "platform-ops"
+  },
+  {
+    "deployment_id": "mesh-policy-2001",
+    "timestamp": "2026-03-07T19:02:13Z",
+    "service": "mesh-routing-policy",
+    "environment": "production",
+    "version": "2026.03.07.2",
+    "strategy": "rolling",
+    "status": "completed",
+    "initiated_by": "argo-rollouts"
+  },
+  {
+    "deployment_id": "mesh-policy-2002",
+    "timestamp": "2026-03-07T19:56:21Z",
+    "service": "mesh-routing-policy",
+    "environment": "production",
+    "version": "2026.03.07.1",
+    "strategy": "rollback",
+    "status": "completed",
+    "initiated_by": "incident-commander"
+  }
+]

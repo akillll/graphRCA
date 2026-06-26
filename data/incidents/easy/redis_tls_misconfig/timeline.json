@@ -1,0 +1,37 @@
+[
+  {
+    "timestamp": "2026-02-11T09:36:12Z",
+    "actor": "deploy-controller",
+    "event": "session-api version 2026.02.11.7 completed production rollout"
+  },
+  {
+    "timestamp": "2026-02-11T09:41:00Z",
+    "actor": "monitoring",
+    "event": "Session create failure alert fired as 5xx rate exceeded 5 percent"
+  },
+  {
+    "timestamp": "2026-02-11T09:45:00Z",
+    "actor": "oncall-engineer",
+    "event": "Application logs suggested Redis connectivity issues, initially raising suspicion of a cache node problem"
+  },
+  {
+    "timestamp": "2026-02-11T09:49:00Z",
+    "actor": "sre",
+    "event": "Cache cluster dashboards showed steady CPU, stable connected clients, and no failover events"
+  },
+  {
+    "timestamp": "2026-02-11T09:53:00Z",
+    "actor": "backend-engineer",
+    "event": "Commit inspection found a secure transport toggle shipped in the active release even though production Redis still listens on plain TCP 6379"
+  },
+  {
+    "timestamp": "2026-02-11T09:57:44Z",
+    "actor": "session-oncall",
+    "event": "Rollback to version 2026.02.11.6 started"
+  },
+  {
+    "timestamp": "2026-02-11T10:02:00Z",
+    "actor": "monitoring",
+    "event": "Session creation success recovered immediately after rollback"
+  }
+]

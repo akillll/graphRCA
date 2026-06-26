@@ -1,0 +1,50 @@
+{
+  "root_cause": "Notification delays were caused by an autoscaler regression introduced in version 2026.03.18.3 that averaged visible queue depth across all shards. After a large tenant migration concentrated traffic on shard 7, total backlog and message age rose sharply, but the autoscaler observed only a low per-shard average and did not add capacity until rollback restored total-backlog-based scaling.",
+  "confidence": "high",
+  "evidence_sources": [
+    {
+      "source": "logs",
+      "details": [
+        "Workers report only shard 7 aging out while provider probe logs stay healthy",
+        "Autoscaler decision logs explicitly show low observed depth despite growing queue age"
+      ]
+    },
+    {
+      "source": "metrics",
+      "details": [
+        "notification_worker.total_queue_depth rises past 2200 while notification_autoscaler.observed_visible_depth remains near 120 until rollback",
+        "SES probe latency stays flat, reducing confidence in an external provider slowdown"
+      ]
+    },
+    {
+      "source": "commits",
+      "details": [
+        "Commit 1a7b210 changed the autoscaler to average visible depth across shards",
+        "Commit 912d4f2 moved a large tenant onto shard 7, creating the skewed load shape"
+      ]
+    },
+    {
+      "source": "deployments",
+      "details": [
+        "Tenant migration precedes the incident context, autoscaler rollout precedes symptom acceleration, and rollback immediately changes scaling behavior"
+      ]
+    },
+    {
+      "source": "operational_context",
+      "details": [
+        "Only a subset of tenants saw delays, which fits a hot-shard scenario rather than a fleet-wide dependency failure"
+      ]
+    }
+  ],
+  "recommended_actions": [
+    "Scale notification workers on total backlog plus per-shard oldest-message-age, not averaged shard depth alone",
+    "Add safeguards that detect skewed shard load after tenant migrations",
+    "Canary autoscaler logic against synthetic hot-shard traffic before production rollout"
+  ],
+  "expected_investigation_path": [
+    "Check whether delivery providers are degraded or whether delays are localized to a shard",
+    "Compare worker backlog metrics with the autoscaler's own observed signal",
+    "Review recent autoscaler commits and recent shard-mapping operational changes",
+    "Confirm causality from deployment timing and recovery after rollback-induced scale-up"
+  ]
+}

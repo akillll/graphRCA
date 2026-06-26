@@ -1,0 +1,32 @@
+[
+  {
+    "deployment_id": "billing-recon-3001",
+    "timestamp": "2026-04-09T01:55:00Z",
+    "service": "billing-reconciler",
+    "environment": "production",
+    "version": "nightly-2026-04-09",
+    "strategy": "scheduled-job",
+    "status": "started",
+    "initiated_by": "cron"
+  },
+  {
+    "deployment_id": "entitlements-prod-9101",
+    "timestamp": "2026-04-09T02:03:28Z",
+    "service": "entitlements-api",
+    "environment": "production",
+    "version": "2026.04.09.2",
+    "strategy": "rolling",
+    "status": "completed",
+    "initiated_by": "argo-rollouts"
+  },
+  {
+    "deployment_id": "entitlements-prod-9102",
+    "timestamp": "2026-04-09T02:39:12Z",
+    "service": "entitlements-api",
+    "environment": "production",
+    "version": "2026.04.09.1",
+    "strategy": "rollback",
+    "status": "completed",
+    "initiated_by": "incident-commander"
+  }
+]

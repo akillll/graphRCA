@@ -1,0 +1,99 @@
+{
+  "benchmark_id": "benchmark_hard_v1",
+  "difficulty": "hard",
+  "description": "Hard benchmark set for distributed production-style incidents that require deep evidence correlation, timeline reconstruction, competing-hypothesis elimination, and reasoning across multiple affected services.",
+  "incidents": [
+    {
+      "incident_id": "hard_gateway_reconnect_storm_2026_05_03",
+      "path": "data/incidents/hard/gateway_reconnect_storm",
+      "service": "realtime-gateway",
+      "severity": "sev-1",
+      "expected_tools": [
+        "search_logs",
+        "get_metrics",
+        "get_recent_commits",
+        "get_deployments",
+        "search_runbooks"
+      ],
+      "required_evidence_sources": [
+        "logs",
+        "metrics",
+        "commits",
+        "deployments",
+        "operational_context",
+        "multiple_affected_services"
+      ]
+    },
+    {
+      "incident_id": "hard_feature_flag_cache_stampede_2026_04_14",
+      "path": "data/incidents/hard/feature_flag_cache_stampede",
+      "service": "feature-flag-control-plane",
+      "severity": "sev-1",
+      "expected_tools": [
+        "search_logs",
+        "get_metrics",
+        "get_recent_commits",
+        "get_deployments",
+        "search_runbooks"
+      ],
+      "required_evidence_sources": [
+        "logs",
+        "metrics",
+        "commits",
+        "deployments",
+        "operational_context",
+        "multiple_affected_services"
+      ]
+    },
+    {
+      "incident_id": "hard_service_mesh_timeout_chain_2026_03_07",
+      "path": "data/incidents/hard/service_mesh_timeout_chain",
+      "service": "checkout-orchestrator",
+      "severity": "sev-1",
+      "expected_tools": [
+        "search_logs",
+        "get_metrics",
+        "get_recent_commits",
+        "get_deployments",
+        "search_runbooks"
+      ],
+      "required_evidence_sources": [
+        "logs",
+        "metrics",
+        "commits",
+        "deployments",
+        "operational_context",
+        "multiple_affected_services"
+      ]
+    },
+    {
+      "incident_id": "hard_cross_region_queue_replay_storm_2026_01_18",
+      "path": "data/incidents/hard/cross_region_queue_replay_storm",
+      "service": "event-ingestion-pipeline",
+      "severity": "sev-1",
+      "expected_tools": [
+        "search_logs",
+        "get_metrics",
+        "get_recent_commits",
+        "get_deployments",
+        "search_runbooks"
+      ],
+      "required_evidence_sources": [
+        "logs",
+        "metrics",
+        "commits",
+        "deployments",
+        "operational_context",
+        "multiple_affected_services"
+      ]
+    }
+  ],
+  "scoring_dimensions": [
+    "root_cause_accuracy",
+    "evidence_coverage",
+    "confidence_explainability",
+    "timeline_reconstruction",
+    "hypothesis_refinement",
+    "distributed_reasoning"
+  ]
+}

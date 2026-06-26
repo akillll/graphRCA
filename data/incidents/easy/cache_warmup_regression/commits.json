@@ -1,0 +1,30 @@
+[
+  {
+    "commit_id": "55b191e",
+    "author": "rgupta",
+    "timestamp": "2026-04-21T12:43:17Z",
+    "message": "Shorten product cache TTL to improve price freshness during flash-sale edits",
+    "files_changed": [
+      "config/catalog/cache.yml",
+      "src/cache/cache_policy.ts"
+    ]
+  },
+  {
+    "commit_id": "d53c9e4",
+    "author": "rgupta",
+    "timestamp": "2026-04-21T12:45:09Z",
+    "message": "Skip async warmup for entries below minimum reusable TTL",
+    "files_changed": [
+      "src/cache/warmup_scheduler.ts"
+    ]
+  },
+  {
+    "commit_id": "fbc8142",
+    "author": "mlewis",
+    "timestamp": "2026-04-21T12:53:42Z",
+    "message": "Add Redis hit-ratio panel to catalog dashboard",
+    "files_changed": [
+      "monitoring/catalog_dashboard.json"
+    ]
+  }
+]

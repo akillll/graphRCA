@@ -1,0 +1,56 @@
+{
+  "root_cause": "A gateway release tightened resume validation after shard transfers and rejected resume tokens whose generation lagged the newly moved shard state. During a scheduled shard rebalance, that change invalidated a large set of otherwise recoverable client sessions, forcing full reconnects. The resulting identify surge saturated auth and session-store dependencies, which looked like primary failures but were downstream effects of a reconnect storm.",
+  "confidence": "high",
+  "evidence_sources": [
+    {
+      "source": "logs",
+      "details": [
+        "Resume generation mismatch and stale nonce rejections begin immediately after the deployment and rebalance overlap",
+        "Redis and auth warnings appear after reconnect and identify amplification has already started"
+      ]
+    },
+    {
+      "source": "metrics",
+      "details": [
+        "gateway.resume_rejection_percent and identify_requests_per_min spike before session-store CPU and auth latency peak",
+        "edge packet loss remains normal, weakening the regional network hypothesis"
+      ]
+    },
+    {
+      "source": "commits",
+      "details": [
+        "Commit c1827ef changed resume token handling around shard generation mismatches",
+        "Commit ea92b13 tightened identify limiter behavior, worsening the recovery path under reconnect load"
+      ]
+    },
+    {
+      "source": "deployments",
+      "details": [
+        "The rebalance starts first, then the gateway rollout lands, and the incident begins only once both conditions overlap"
+      ]
+    },
+    {
+      "source": "operational_context",
+      "details": [
+        "Only sessions touched by shard transfers showed elevated resume rejection early, which distinguishes the incident from a generic gateway fleet bug"
+      ]
+    },
+    {
+      "source": "multiple_affected_services",
+      "details": [
+        "realtime-gateway, session-store, auth-api, and client-relay degrade in sequence rather than simultaneously"
+      ]
+    }
+  ],
+  "recommended_actions": [
+    "Make session resume tolerant of generation drift during controlled shard transfer windows",
+    "Add reconnect storm circuit breakers that protect auth and session-store from identify amplification",
+    "Prevent control-plane rebalances and resume-path deployments from overlapping without canary validation"
+  ],
+  "expected_investigation_path": [
+    "Start with disconnect and reconnect telemetry rather than assuming edge instability",
+    "Construct the sequence across gateway, auth, and session-store to separate primary from secondary failures",
+    "Review commits and operational events touching shard transfer and resume semantics",
+    "Validate the RCA by correlating the overlapping rebalance plus deployment timing and rollback recovery"
+  ]
+}

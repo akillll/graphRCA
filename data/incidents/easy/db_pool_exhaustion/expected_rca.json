@@ -1,0 +1,43 @@
+{
+  "root_cause": "Checkout API pods exhausted their local PostgreSQL connection pools after version 2026.05.14.3 rolled out with a reduced max pool size. The logs alone suggested a generic database slowdown, but the decisive signal was that database host connection utilization stayed normal while application-side pool waiters and checkout latency spiked immediately after the deployment.",
+  "confidence": "high",
+  "evidence_sources": [
+    {
+      "source": "logs",
+      "details": [
+        "Repeated connection acquisition warnings and context deadline exceeded errors began at 16:05Z",
+        "No matching PostgreSQL node health or failover errors appeared in the same window"
+      ]
+    },
+    {
+      "source": "metrics",
+      "details": [
+        "checkout_api.db_pool_waiters increased from 0 to 58 while postgres_primary.active_connections_percent stayed near 50 percent",
+        "checkout_api.p95_latency_ms and error rate spiked within one five-minute bucket of the deploy"
+      ]
+    },
+    {
+      "source": "commits",
+      "details": [
+        "Commit 91fb2c8 normalized DB pool settings across environments and packaged the reduced pool limit"
+      ]
+    },
+    {
+      "source": "deployments",
+      "details": [
+        "Production rollout completed at 15:59:22Z and rollback at 16:29:54Z restored the previous version"
+      ]
+    }
+  ],
+  "recommended_actions": [
+    "Restore the previous max connection pool size and validate environment-specific overrides before rollout",
+    "Alert on application pool waiter growth separately from database host saturation",
+    "Add deployment-time config diff checks for connection pool settings"
+  ],
+  "expected_investigation_path": [
+    "search logs for latency and timeout symptoms",
+    "compare application-side pool saturation metrics with database host utilization",
+    "inspect recent commits touching database configuration",
+    "correlate impact onset with the 15:59Z deployment and confirm rollback recovery"
+  ]
+}

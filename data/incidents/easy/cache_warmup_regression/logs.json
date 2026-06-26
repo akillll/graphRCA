@@ -1,0 +1,138 @@
+[
+  {
+    "timestamp": "2026-04-21T13:04:58Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollout",
+    "message": "Production deployment completed for catalog-api version 2026.04.21.5",
+    "trace_id": "deploy-c911"
+  },
+  {
+    "timestamp": "2026-04-21T13:07:13Z",
+    "level": "INFO",
+    "service": "catalog-api",
+    "component": "search",
+    "message": "GET /v1/search?q=headphones 200 122ms",
+    "trace_id": "cat-710a"
+  },
+  {
+    "timestamp": "2026-04-21T13:12:22Z",
+    "level": "WARN",
+    "service": "catalog-api",
+    "component": "cache",
+    "message": "Redis miss for key product:sku_91822",
+    "trace_id": "cat-71af"
+  },
+  {
+    "timestamp": "2026-04-21T13:12:24Z",
+    "level": "INFO",
+    "service": "catalog-api",
+    "component": "db",
+    "message": "Loaded product document from postgres in 63ms",
+    "trace_id": "cat-71af"
+  },
+  {
+    "timestamp": "2026-04-21T13:13:08Z",
+    "level": "WARN",
+    "service": "catalog-api",
+    "component": "cache",
+    "message": "Redis miss for key category:home_office:page_1",
+    "trace_id": "cat-71d4"
+  },
+  {
+    "timestamp": "2026-04-21T13:13:10Z",
+    "level": "WARN",
+    "service": "catalog-api",
+    "component": "db",
+    "message": "Slow query detected: select product_id from category_products where category_slug = $1 limit 60",
+    "trace_id": "cat-71d4"
+  },
+  {
+    "timestamp": "2026-04-21T13:14:55Z",
+    "level": "INFO",
+    "service": "edge-proxy",
+    "component": "envoy",
+    "message": "downstream_rq_5xx reset count remains within normal range",
+    "trace_id": "edge-19aa"
+  },
+  {
+    "timestamp": "2026-04-21T13:16:01Z",
+    "level": "WARN",
+    "service": "catalog-api",
+    "component": "cache",
+    "message": "Background warmup skipped because key TTL below threshold",
+    "trace_id": "cat-7258"
+  },
+  {
+    "timestamp": "2026-04-21T13:17:34Z",
+    "level": "WARN",
+    "service": "catalog-api",
+    "component": "cache",
+    "message": "Redis miss for key product:sku_44129",
+    "trace_id": "cat-72b1"
+  },
+  {
+    "timestamp": "2026-04-21T13:17:35Z",
+    "level": "ERROR",
+    "service": "catalog-api",
+    "component": "db",
+    "message": "context deadline exceeded while loading product pricing",
+    "trace_id": "cat-72b1"
+  },
+  {
+    "timestamp": "2026-04-21T13:17:36Z",
+    "level": "ERROR",
+    "service": "catalog-api",
+    "component": "http",
+    "message": "GET /v1/products/sku_44129 503 1842ms",
+    "trace_id": "cat-72b1"
+  },
+  {
+    "timestamp": "2026-04-21T13:19:11Z",
+    "level": "INFO",
+    "service": "redis-cache-a",
+    "component": "server",
+    "message": "Background save terminated with success",
+    "trace_id": "redis-313a"
+  },
+  {
+    "timestamp": "2026-04-21T13:21:09Z",
+    "level": "WARN",
+    "service": "catalog-api",
+    "component": "cache",
+    "message": "Redis miss ratio exceeded 60 percent over 5m window",
+    "trace_id": "cat-735e"
+  },
+  {
+    "timestamp": "2026-04-21T13:23:48Z",
+    "level": "WARN",
+    "service": "catalog-api",
+    "component": "http",
+    "message": "GET /v1/search?q=monitor 499 2031ms",
+    "trace_id": "cat-73da"
+  },
+  {
+    "timestamp": "2026-04-21T13:28:17Z",
+    "level": "INFO",
+    "service": "ops-bot",
+    "component": "chatops",
+    "message": "Manual cache flush request rejected; cluster health normal",
+    "trace_id": "ops-892d"
+  },
+  {
+    "timestamp": "2026-04-21T13:36:02Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollback",
+    "message": "Rollback completed for catalog-api version 2026.04.21.4",
+    "trace_id": "deploy-c916"
+  },
+  {
+    "timestamp": "2026-04-21T13:39:51Z",
+    "level": "INFO",
+    "service": "catalog-api",
+    "component": "http",
+    "message": "GET /v1/products/sku_44129 200 128ms",
+    "trace_id": "cat-76ae"
+  }
+]

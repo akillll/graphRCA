@@ -1,0 +1,25 @@
+{
+  "id": "easy_webhook_retry_amplification_2026_03_03",
+  "title": "Outbound webhook backlog triggered by timeout regression",
+  "difficulty": "easy",
+  "service": "webhook-dispatcher",
+  "severity": "sev-2",
+  "summary": "Webhook deliveries piled up and customer notifications lagged behind. Logs show upstream timeouts to a partner endpoint, but the real RCA depends on comparing external latency, queue growth, and a recent timeout change deployed just before the incident.",
+  "start_time": "2026-03-03T18:26:00Z",
+  "end_time": "2026-03-03T19:02:00Z",
+  "tags": [
+    "webhooks",
+    "queues",
+    "timeouts",
+    "retry",
+    "deployment-regression"
+  ],
+  "primary_hypotheses": [
+    "partner outage",
+    "queue worker saturation",
+    "outbound timeout misconfiguration"
+  ],
+  "relevant_runbooks": [
+    "webhook_delivery_backlog.md"
+  ]
+}

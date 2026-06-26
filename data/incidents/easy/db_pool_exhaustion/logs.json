@@ -1,0 +1,154 @@
+[
+  {
+    "timestamp": "2026-05-14T15:58:12Z",
+    "level": "INFO",
+    "service": "checkout-api",
+    "component": "http",
+    "message": "GET /health 200 3ms",
+    "trace_id": "trc-91a4"
+  },
+  {
+    "timestamp": "2026-05-14T16:00:04Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollout",
+    "message": "Production deployment completed for checkout-api version 2026.05.14.3",
+    "trace_id": "deploy-5b1"
+  },
+  {
+    "timestamp": "2026-05-14T16:02:27Z",
+    "level": "INFO",
+    "service": "checkout-api",
+    "component": "fraud-client",
+    "message": "Fraud check completed in 184ms for order draft",
+    "trace_id": "trc-91d9"
+  },
+  {
+    "timestamp": "2026-05-14T16:05:16Z",
+    "level": "WARN",
+    "service": "checkout-api",
+    "component": "db",
+    "message": "Connection acquisition exceeded 250ms threshold",
+    "trace_id": "trc-9221"
+  },
+  {
+    "timestamp": "2026-05-14T16:05:19Z",
+    "level": "INFO",
+    "service": "checkout-api",
+    "component": "http",
+    "message": "POST /v1/checkout 200 431ms",
+    "trace_id": "trc-9221"
+  },
+  {
+    "timestamp": "2026-05-14T16:06:03Z",
+    "level": "WARN",
+    "service": "checkout-api",
+    "component": "db",
+    "message": "Timed out waiting for idle connection",
+    "trace_id": "trc-9235"
+  },
+  {
+    "timestamp": "2026-05-14T16:06:03Z",
+    "level": "ERROR",
+    "service": "checkout-api",
+    "component": "orders-repository",
+    "message": "Query failed after 2000ms: select * from payment_methods where account_id = $1",
+    "trace_id": "trc-9235"
+  },
+  {
+    "timestamp": "2026-05-14T16:06:04Z",
+    "level": "WARN",
+    "service": "edge-proxy",
+    "component": "envoy",
+    "message": "upstream request timeout after 2.5s for checkout-api",
+    "trace_id": "trc-9235"
+  },
+  {
+    "timestamp": "2026-05-14T16:07:11Z",
+    "level": "INFO",
+    "service": "checkout-api",
+    "component": "inventory-client",
+    "message": "Reserved inventory in 94ms",
+    "trace_id": "trc-9248"
+  },
+  {
+    "timestamp": "2026-05-14T16:07:52Z",
+    "level": "WARN",
+    "service": "checkout-api",
+    "component": "db",
+    "message": "Pool wait count in last minute exceeded baseline",
+    "trace_id": "trc-9262"
+  },
+  {
+    "timestamp": "2026-05-14T16:08:10Z",
+    "level": "ERROR",
+    "service": "checkout-api",
+    "component": "db",
+    "message": "pq: canceling statement due to user request",
+    "trace_id": "trc-9277"
+  },
+  {
+    "timestamp": "2026-05-14T16:08:11Z",
+    "level": "ERROR",
+    "service": "checkout-api",
+    "component": "http",
+    "message": "POST /v1/checkout 503 2504ms",
+    "trace_id": "trc-9277"
+  },
+  {
+    "timestamp": "2026-05-14T16:09:45Z",
+    "level": "INFO",
+    "service": "postgres-primary",
+    "component": "autovacuum",
+    "message": "automatic vacuum of table orders completed",
+    "trace_id": "pg-13aa"
+  },
+  {
+    "timestamp": "2026-05-14T16:10:32Z",
+    "level": "WARN",
+    "service": "checkout-api",
+    "component": "db",
+    "message": "All connections busy; borrowing requests queued",
+    "trace_id": "trc-92be"
+  },
+  {
+    "timestamp": "2026-05-14T16:11:41Z",
+    "level": "INFO",
+    "service": "feature-flag-sync",
+    "component": "watcher",
+    "message": "Refreshed 42 flags",
+    "trace_id": "cfg-61df"
+  },
+  {
+    "timestamp": "2026-05-14T16:14:03Z",
+    "level": "ERROR",
+    "service": "checkout-api",
+    "component": "db",
+    "message": "failed to acquire connection: context deadline exceeded",
+    "trace_id": "trc-9314"
+  },
+  {
+    "timestamp": "2026-05-14T16:15:28Z",
+    "level": "WARN",
+    "service": "checkout-api",
+    "component": "http",
+    "message": "client canceled request while waiting on upstream",
+    "trace_id": "trc-934f"
+  },
+  {
+    "timestamp": "2026-05-14T16:31:09Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollback",
+    "message": "Rollback completed for checkout-api version 2026.05.14.2",
+    "trace_id": "deploy-5b4"
+  },
+  {
+    "timestamp": "2026-05-14T16:33:17Z",
+    "level": "INFO",
+    "service": "checkout-api",
+    "component": "http",
+    "message": "POST /v1/checkout 200 228ms",
+    "trace_id": "trc-949a"
+  }
+]

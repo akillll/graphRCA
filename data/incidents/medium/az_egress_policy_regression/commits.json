@@ -1,0 +1,29 @@
+[
+  {
+    "commit_id": "b14c6d2",
+    "author": "platform-net",
+    "timestamp": "2026-02-27T07:52:11Z",
+    "message": "Tighten auth namespace egress destinations to declared service identities",
+    "files_changed": [
+      "network/auth/egress-policy.yaml"
+    ]
+  },
+  {
+    "commit_id": "2f9d8bb",
+    "author": "platform-net",
+    "timestamp": "2026-02-27T07:56:04Z",
+    "message": "Normalize token introspection service policy labels across node pools",
+    "files_changed": [
+      "network/auth/service-identity-map.yaml"
+    ]
+  },
+  {
+    "commit_id": "d8724a0",
+    "author": "cluster-bot",
+    "timestamp": "2026-02-27T07:40:00Z",
+    "message": "Rotate app-general-us-east-1c node group to patched AMI",
+    "files_changed": [
+      "ops/cluster/node-rotation.yaml"
+    ]
+  }
+]

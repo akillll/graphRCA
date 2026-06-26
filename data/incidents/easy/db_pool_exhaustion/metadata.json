@@ -1,0 +1,25 @@
+{
+  "id": "easy_db_pool_exhaustion_2026_05_14",
+  "title": "Checkout API latency spike after database pool configuration regression",
+  "difficulty": "easy",
+  "service": "checkout-api",
+  "severity": "sev-2",
+  "summary": "Checkout requests began timing out minutes after a production rollout. The failure presents as intermittent PostgreSQL timeouts, but the underlying cause requires correlating pool saturation metrics with a configuration change deployed shortly before impact.",
+  "start_time": "2026-05-14T16:05:00Z",
+  "end_time": "2026-05-14T16:39:00Z",
+  "tags": [
+    "database",
+    "postgres",
+    "connection-pool",
+    "latency",
+    "deployment-regression"
+  ],
+  "primary_hypotheses": [
+    "database saturation",
+    "slow query regression",
+    "application pool exhaustion"
+  ],
+  "relevant_runbooks": [
+    "database_timeout.md"
+  ]
+}

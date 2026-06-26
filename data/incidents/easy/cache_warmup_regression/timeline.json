@@ -1,0 +1,37 @@
+[
+  {
+    "timestamp": "2026-04-21T13:04:58Z",
+    "actor": "deploy-controller",
+    "event": "catalog-api version 2026.04.21.5 completed rollout"
+  },
+  {
+    "timestamp": "2026-04-21T13:12:00Z",
+    "actor": "monitoring",
+    "event": "Catalog read latency breached alert threshold while overall request volume stayed near baseline"
+  },
+  {
+    "timestamp": "2026-04-21T13:17:00Z",
+    "actor": "oncall-engineer",
+    "event": "Initial theory focused on a slow PostgreSQL read replica because slow query warnings appeared after cache misses"
+  },
+  {
+    "timestamp": "2026-04-21T13:20:00Z",
+    "actor": "oncall-engineer",
+    "event": "Redis cluster health review showed the cache node remained healthy, shifting attention to application cache behavior"
+  },
+  {
+    "timestamp": "2026-04-21T13:24:00Z",
+    "actor": "backend-engineer",
+    "event": "Recent commits revealed TTL reduction and warmup skipping logic included in the release"
+  },
+  {
+    "timestamp": "2026-04-21T13:33:40Z",
+    "actor": "incident-commander",
+    "event": "Rollback to version 2026.04.21.4 initiated"
+  },
+  {
+    "timestamp": "2026-04-21T13:39:00Z",
+    "actor": "monitoring",
+    "event": "Redis hit rate and API latency returned to baseline after rollback"
+  }
+]

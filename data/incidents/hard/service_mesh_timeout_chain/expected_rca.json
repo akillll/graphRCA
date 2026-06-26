@@ -1,0 +1,56 @@
+{
+  "root_cause": "A service-mesh policy release changed checkout-path traffic to fall back cross-zone earlier and increased retry budgets. When inventory capacity in one zone was temporarily reduced for maintenance, checkout calls began traversing longer cross-zone paths and timing out more often. Mesh retries amplified that latency into duplicated reservation work, queue backpressure, and timeout propagation through pricing and checkout. Payment symptoms were secondary because requests often reached payment only after the upstream deadline was already exhausted.",
+  "confidence": "high",
+  "evidence_sources": [
+    {
+      "source": "logs",
+      "details": [
+        "Mesh retry and cross-zone fallback warnings begin before payment warnings and before inventory queue saturation peaks",
+        "Payment probes remain healthy while payment receives deadline-canceled traffic"
+      ]
+    },
+    {
+      "source": "metrics",
+      "details": [
+        "mesh_sidecar.cross_zone_routing_percent and retry_rate_percent rise sharply ahead of the worst checkout failures",
+        "pricing cache remains healthy, eliminating a pricing cache miss hypothesis"
+      ]
+    },
+    {
+      "source": "commits",
+      "details": [
+        "Commit 92ac103 changed fallback selection earlier under local scarcity",
+        "Commit 4f1d201 increased retries on latency-sensitive checkout calls"
+      ]
+    },
+    {
+      "source": "deployments",
+      "details": [
+        "Mesh rollout and inventory maintenance overlap before impact, and rollback reduces retries and cross-zone routing before full checkout recovery"
+      ]
+    },
+    {
+      "source": "operational_context",
+      "details": [
+        "The maintenance window created the endpoint scarcity that turned the new routing policy from harmless into pathological"
+      ]
+    },
+    {
+      "source": "multiple_affected_services",
+      "details": [
+        "checkout-orchestrator, pricing-api, inventory-api, payment-adapter, and mesh-sidecars degrade in a clear dependency chain"
+      ]
+    }
+  ],
+  "recommended_actions": [
+    "Cap retries by end-to-end checkout budget rather than per-hop policy defaults",
+    "Disallow aggressive cross-zone fallback changes when endpoint pools are already reduced by maintenance",
+    "Alert on rising cross-zone routing plus retry overflow as an early distributed timeout-chain signal"
+  ],
+  "expected_investigation_path": [
+    "Resist anchoring on the last visible service in the user workflow",
+    "Build a per-service timeline to find which latencies and retries move first",
+    "Correlate mesh-policy changes with maintenance context and downstream queue buildup",
+    "Confirm the hypothesis using rollback ordering and the persistence of healthy payment and pricing cache signals"
+  ]
+}

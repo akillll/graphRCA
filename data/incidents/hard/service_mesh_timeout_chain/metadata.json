@@ -1,0 +1,40 @@
+{
+  "id": "hard_service_mesh_timeout_chain_2026_03_07",
+  "title": "Mesh routing change caused distributed timeout chain across checkout path",
+  "difficulty": "hard",
+  "service": "checkout-orchestrator",
+  "severity": "sev-1",
+  "summary": "Checkout success collapsed after a distributed timeout chain spread across pricing, inventory, and payment services. The incident looked at first like a payment gateway degradation or a single overloaded service, but the real RCA requires following the timeline of service-mesh retries, timeout inflation, queue backpressure, and a routing policy rollout that changed cross-zone call paths.",
+  "start_time": "2026-03-07T19:14:00Z",
+  "end_time": "2026-03-07T20:31:00Z",
+  "tags": [
+    "service-mesh",
+    "timeout-chain",
+    "checkout",
+    "retries",
+    "backpressure",
+    "cross-zone-routing"
+  ],
+  "primary_hypotheses": [
+    "payment gateway slowdown",
+    "inventory lock contention",
+    "pricing cache issue",
+    "service mesh retry and timeout amplification"
+  ],
+  "operational_context": [
+    "A zone-aware routing policy rollout at 19:02Z changed fallback behavior when local endpoints were scarce.",
+    "One inventory node pool in us-east-1b was already running at reduced spare capacity due to maintenance."
+  ],
+  "affected_services": [
+    "checkout-orchestrator",
+    "pricing-api",
+    "inventory-api",
+    "payment-adapter",
+    "mesh-sidecar"
+  ],
+  "relevant_runbooks": [
+    "distributed_timeout_chain.md",
+    "mesh_retry_amplification.md",
+    "backpressure_cascade.md"
+  ]
+}

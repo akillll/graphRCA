@@ -1,0 +1,32 @@
+[
+  {
+    "deployment_id": "media-prod-2201",
+    "timestamp": "2026-05-22T11:02:11Z",
+    "service": "media-worker",
+    "environment": "production",
+    "version": "2026.05.22.4",
+    "strategy": "rolling",
+    "status": "completed",
+    "initiated_by": "argo-rollouts"
+  },
+  {
+    "deployment_id": "campaign-asset-announce-11",
+    "timestamp": "2026-05-22T10:30:00Z",
+    "service": "growth-campaigns",
+    "environment": "production",
+    "version": "profile-refresh-may",
+    "strategy": "scheduled-event",
+    "status": "started",
+    "initiated_by": "marketing-ops"
+  },
+  {
+    "deployment_id": "media-prod-2202",
+    "timestamp": "2026-05-22T12:06:48Z",
+    "service": "media-worker",
+    "environment": "production",
+    "version": "2026.05.22.3",
+    "strategy": "rollback",
+    "status": "completed",
+    "initiated_by": "incident-commander"
+  }
+]

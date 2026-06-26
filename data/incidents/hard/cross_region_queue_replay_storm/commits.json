@@ -1,0 +1,29 @@
+[
+  {
+    "commit_id": "8a71c22",
+    "author": "streaming-team",
+    "timestamp": "2026-01-18T05:34:51Z",
+    "message": "Restore mirrored consumer checkpoints before local epoch advancement during failover",
+    "files_changed": [
+      "src/consumer/checkpoint_manager.kt"
+    ]
+  },
+  {
+    "commit_id": "0d24f7c",
+    "author": "streaming-team",
+    "timestamp": "2026-01-18T05:39:16Z",
+    "message": "Defer checkpoint writes when mirrored generation appears ahead of local state",
+    "files_changed": [
+      "src/consumer/failover_recovery.kt"
+    ]
+  },
+  {
+    "commit_id": "f5b4081",
+    "author": "traffic-bot",
+    "timestamp": "2026-01-18T05:10:00Z",
+    "message": "Prepare secondary-region event ingestion failover profile",
+    "files_changed": [
+      "ops/failover/event_ingestion.yaml"
+    ]
+  }
+]

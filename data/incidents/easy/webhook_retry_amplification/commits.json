@@ -1,0 +1,21 @@
+[
+  {
+    "commit_id": "11c0d9a",
+    "author": "aolson",
+    "timestamp": "2026-03-03T17:58:52Z",
+    "message": "Align outbound webhook timeout with edge retry budget",
+    "files_changed": [
+      "config/webhooks/dispatch.yml",
+      "src/delivery/http_client.rb"
+    ]
+  },
+  {
+    "commit_id": "892fd1c",
+    "author": "aolson",
+    "timestamp": "2026-03-03T18:01:31Z",
+    "message": "Emit retry attempt count for partner deliveries",
+    "files_changed": [
+      "src/metrics/retry_metrics.rb"
+    ]
+  }
+]

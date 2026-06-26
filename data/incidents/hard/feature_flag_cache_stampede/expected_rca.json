@@ -1,0 +1,56 @@
+{
+  "root_cause": "A control-plane release changed namespace updates from targeted cache invalidations to wildcard invalidation and also bypassed singleflight protection for large namespace fanout sets. Under increased launch traffic, one hot namespace repeatedly invalidated tens of thousands of keys, causing a cache stampede. The resulting refill surge overloaded PostgreSQL and triggered client retries from edge SDK bootstrap paths, which amplified the outage and made the database appear to be the primary failure.",
+  "confidence": "high",
+  "evidence_sources": [
+    {
+      "source": "logs",
+      "details": [
+        "Wildcard invalidation and singleflight bypass warnings appear before sustained database saturation",
+        "Edge serves last-known-good flags, which explains stale behavior without requiring a CDN outage"
+      ]
+    },
+    {
+      "source": "metrics",
+      "details": [
+        "config_cache.hit_rate_percent collapses before postgres CPU peaks",
+        "resolve_rps and retry_rate_percent rise together, showing demand amplification rather than a simple backend slowdown"
+      ]
+    },
+    {
+      "source": "commits",
+      "details": [
+        "Commit 5bca9f3 introduced wildcard namespace invalidation",
+        "Commit f104dd8 disabled dedupe protection exactly where the hot namespace expanded fanout"
+      ]
+    },
+    {
+      "source": "deployments",
+      "details": [
+        "The control-plane rollout lands just before launch traffic increases, and rollback recovers hit rate and load"
+      ]
+    },
+    {
+      "source": "operational_context",
+      "details": [
+        "The launch increased anonymous bootstrap lookups, which turned a bad invalidation pattern into a large-scale stampede"
+      ]
+    },
+    {
+      "source": "multiple_affected_services",
+      "details": [
+        "feature-flag-control-plane, config-cache, postgres, api-edge, and SDK ingress degrade in a cascading chain"
+      ]
+    }
+  ],
+  "recommended_actions": [
+    "Restore targeted invalidation and enforce deduped cache fills for high-cardinality namespaces",
+    "Add client-side retry budgets and stale-while-revalidate protection for flag bootstrap traffic",
+    "Treat cache-hit collapse preceding DB saturation as a control-plane stampede alert, not just a database alert"
+  ],
+  "expected_investigation_path": [
+    "Avoid locking onto the database hypothesis until the pre-DB cache behavior is examined",
+    "Reconstruct the chain from invalidations to cache misses to refill load to retries across dependent services",
+    "Review rollout changes and traffic context together because neither alone is sufficient",
+    "Validate the root cause with recovery ordering after rollback"
+  ]
+}

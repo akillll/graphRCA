@@ -1,0 +1,32 @@
+[
+  {
+    "deployment_id": "flags-prod-4001",
+    "timestamp": "2026-04-14T12:56:41Z",
+    "service": "feature-flag-control-plane",
+    "environment": "production",
+    "version": "2026.04.14.4",
+    "strategy": "rolling",
+    "status": "completed",
+    "initiated_by": "argo-rollouts"
+  },
+  {
+    "deployment_id": "spring-launch-1901",
+    "timestamp": "2026-04-14T13:00:00Z",
+    "service": "launch-orchestrator",
+    "environment": "production",
+    "version": "spring-launch-policy",
+    "strategy": "scheduled-launch",
+    "status": "started",
+    "initiated_by": "growth-ops"
+  },
+  {
+    "deployment_id": "flags-prod-4002",
+    "timestamp": "2026-04-14T13:54:14Z",
+    "service": "feature-flag-control-plane",
+    "environment": "production",
+    "version": "2026.04.14.3",
+    "strategy": "rollback",
+    "status": "completed",
+    "initiated_by": "incident-commander"
+  }
+]

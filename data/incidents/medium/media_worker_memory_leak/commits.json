@@ -1,0 +1,31 @@
+[
+  {
+    "commit_id": "5cd88a1",
+    "author": "tnguyen",
+    "timestamp": "2026-05-22T10:34:22Z",
+    "message": "Reuse image metadata decode context across derivative generation",
+    "files_changed": [
+      "src/imaging/exif_parser.go",
+      "src/imaging/pipeline.go"
+    ]
+  },
+  {
+    "commit_id": "0e4a7dd",
+    "author": "tnguyen",
+    "timestamp": "2026-05-22T10:39:17Z",
+    "message": "Increase avatar variant fanout for high-density clients",
+    "files_changed": [
+      "config/media/variants.yml",
+      "src/imaging/variant_planner.go"
+    ]
+  },
+  {
+    "commit_id": "a3bd1ef",
+    "author": "dmitra",
+    "timestamp": "2026-05-22T10:47:50Z",
+    "message": "Emit heap watermark metric from worker runtime",
+    "files_changed": [
+      "src/runtime/metrics.go"
+    ]
+  }
+]

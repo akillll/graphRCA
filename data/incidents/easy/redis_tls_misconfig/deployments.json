@@ -1,0 +1,22 @@
+[
+  {
+    "deployment_id": "session-prod-4401",
+    "timestamp": "2026-02-11T09:36:12Z",
+    "service": "session-api",
+    "environment": "production",
+    "version": "2026.02.11.7",
+    "strategy": "rolling",
+    "status": "completed",
+    "initiated_by": "argo-rollouts"
+  },
+  {
+    "deployment_id": "session-prod-4402",
+    "timestamp": "2026-02-11T09:57:44Z",
+    "service": "session-api",
+    "environment": "production",
+    "version": "2026.02.11.6",
+    "strategy": "rollback",
+    "status": "completed",
+    "initiated_by": "session-oncall"
+  }
+]

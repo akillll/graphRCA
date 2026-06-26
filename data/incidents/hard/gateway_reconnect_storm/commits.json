@@ -1,0 +1,30 @@
+[
+  {
+    "commit_id": "c1827ef",
+    "author": "priya",
+    "timestamp": "2026-05-03T16:18:44Z",
+    "message": "Reject resume tokens with mismatched shard generation after transfer",
+    "files_changed": [
+      "src/gateway/resume_handler.rs",
+      "src/gateway/shard_state.rs"
+    ]
+  },
+  {
+    "commit_id": "ea92b13",
+    "author": "priya",
+    "timestamp": "2026-05-03T16:20:11Z",
+    "message": "Tighten identify limiter reset window during reconnect surges",
+    "files_changed": [
+      "src/gateway/identify_limiter.rs"
+    ]
+  },
+  {
+    "commit_id": "1ff64aa",
+    "author": "ops-bot",
+    "timestamp": "2026-05-03T15:54:00Z",
+    "message": "Schedule evening shard rebalance to smooth node pressure",
+    "files_changed": [
+      "ops/gateway/rebalance_plan.yaml"
+    ]
+  }
+]

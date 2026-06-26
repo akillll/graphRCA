@@ -1,0 +1,130 @@
+[
+  {
+    "timestamp": "2026-01-18T05:58:12Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollout",
+    "message": "Production deployment completed for event-ingestion-consumer version 2026.01.18.3",
+    "trace_id": "deploy-eic301"
+  },
+  {
+    "timestamp": "2026-01-18T06:11:00Z",
+    "level": "INFO",
+    "service": "traffic-manager",
+    "component": "failover",
+    "message": "Shifted 70 percent of event ingestion traffic to us-west-2 secondary region",
+    "trace_id": "fail-7701"
+  },
+  {
+    "timestamp": "2026-01-18T06:18:44Z",
+    "level": "INFO",
+    "service": "kafka-broker",
+    "component": "controller",
+    "message": "Inter-region mirror lag stabilizing after producer shift",
+    "trace_id": "kfk-1811"
+  },
+  {
+    "timestamp": "2026-01-18T06:22:19Z",
+    "level": "WARN",
+    "service": "event-ingestion-consumer",
+    "component": "checkpoint",
+    "message": "consumer_group=ingestion-main restoring checkpoint from mirrored offset store",
+    "trace_id": "ing-8801"
+  },
+  {
+    "timestamp": "2026-01-18T06:23:01Z",
+    "level": "WARN",
+    "service": "event-ingestion-consumer",
+    "component": "processor",
+    "message": "duplicate candidate rate exceeded dedup baseline",
+    "trace_id": "ing-8804"
+  },
+  {
+    "timestamp": "2026-01-18T06:24:18Z",
+    "level": "INFO",
+    "service": "analytics-writer",
+    "component": "sink",
+    "message": "late event acceptance rising after regional shift",
+    "trace_id": "an-5100"
+  },
+  {
+    "timestamp": "2026-01-18T06:26:12Z",
+    "level": "WARN",
+    "service": "dedup-cache",
+    "component": "redis-client",
+    "message": "SETNX latency exceeded 400ms p95 budget",
+    "trace_id": "dup-1102"
+  },
+  {
+    "timestamp": "2026-01-18T06:28:49Z",
+    "level": "WARN",
+    "service": "notification-worker",
+    "component": "queue-consumer",
+    "message": "downstream event queue depth rising faster than publish rate",
+    "trace_id": "ntf-7702"
+  },
+  {
+    "timestamp": "2026-01-18T06:31:55Z",
+    "level": "INFO",
+    "service": "network-probe",
+    "component": "regional",
+    "message": "us-east-1 packet loss normalized below 0.5 percent",
+    "trace_id": "net-4401"
+  },
+  {
+    "timestamp": "2026-01-18T06:34:07Z",
+    "level": "WARN",
+    "service": "event-ingestion-consumer",
+    "component": "checkpoint",
+    "message": "checkpoint write deferred because mirrored store generation newer than local epoch",
+    "trace_id": "ing-8829"
+  },
+  {
+    "timestamp": "2026-01-18T06:36:40Z",
+    "level": "ERROR",
+    "service": "analytics-writer",
+    "component": "sink",
+    "message": "dropping duplicate batch after idempotency window exceeded",
+    "trace_id": "an-5112"
+  },
+  {
+    "timestamp": "2026-01-18T06:41:18Z",
+    "level": "WARN",
+    "service": "kafka-broker",
+    "component": "consumer-group",
+    "message": "ingestion-main rebalance duration exceeded 90s",
+    "trace_id": "kfk-1824"
+  },
+  {
+    "timestamp": "2026-01-18T06:49:06Z",
+    "level": "INFO",
+    "service": "ops-bot",
+    "component": "chatops",
+    "message": "Several teams suspect producer duplication due to elevated duplicate event counts",
+    "trace_id": "chat-dup-1"
+  },
+  {
+    "timestamp": "2026-01-18T06:57:24Z",
+    "level": "WARN",
+    "service": "dedup-cache",
+    "component": "redis-client",
+    "message": "eviction pressure rising; duplicate suppression effectiveness dropping",
+    "trace_id": "dup-1128"
+  },
+  {
+    "timestamp": "2026-01-18T07:09:11Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollback",
+    "message": "Rollback completed for event-ingestion-consumer version 2026.01.18.2",
+    "trace_id": "deploy-eic306"
+  },
+  {
+    "timestamp": "2026-01-18T07:18:22Z",
+    "level": "INFO",
+    "service": "event-ingestion-consumer",
+    "component": "checkpoint",
+    "message": "consumer_group=ingestion-main checkpoint epochs converged after rollback",
+    "trace_id": "ing-rec-11"
+  }
+]

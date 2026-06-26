@@ -1,0 +1,94 @@
+{
+  "benchmark_id": "benchmark_medium_v1",
+  "difficulty": "medium",
+  "description": "Medium benchmark set for production-inspired incidents that require cross-system reasoning, multiple investigation steps, and hypothesis refinement across logs, metrics, commits, deployments, and operational context.",
+  "incidents": [
+    {
+      "incident_id": "medium_media_worker_memory_leak_2026_05_22",
+      "path": "data/incidents/medium/media_worker_memory_leak",
+      "service": "media-worker",
+      "severity": "sev-2",
+      "expected_tools": [
+        "search_logs",
+        "get_metrics",
+        "get_recent_commits",
+        "get_deployments",
+        "search_runbooks"
+      ],
+      "required_evidence_sources": [
+        "logs",
+        "metrics",
+        "commits",
+        "deployments",
+        "operational_context"
+      ]
+    },
+    {
+      "incident_id": "medium_replica_lag_entitlements_2026_04_09",
+      "path": "data/incidents/medium/replica_lag_entitlements",
+      "service": "entitlements-api",
+      "severity": "sev-2",
+      "expected_tools": [
+        "search_logs",
+        "get_metrics",
+        "get_recent_commits",
+        "get_deployments",
+        "search_runbooks"
+      ],
+      "required_evidence_sources": [
+        "logs",
+        "metrics",
+        "commits",
+        "deployments",
+        "operational_context"
+      ]
+    },
+    {
+      "incident_id": "medium_queue_autoscaling_regression_2026_03_18",
+      "path": "data/incidents/medium/queue_autoscaling_regression",
+      "service": "notification-worker",
+      "severity": "sev-2",
+      "expected_tools": [
+        "search_logs",
+        "get_metrics",
+        "get_recent_commits",
+        "get_deployments",
+        "search_runbooks"
+      ],
+      "required_evidence_sources": [
+        "logs",
+        "metrics",
+        "commits",
+        "deployments",
+        "operational_context"
+      ]
+    },
+    {
+      "incident_id": "medium_az_egress_policy_regression_2026_02_27",
+      "path": "data/incidents/medium/az_egress_policy_regression",
+      "service": "auth-api",
+      "severity": "sev-2",
+      "expected_tools": [
+        "search_logs",
+        "get_metrics",
+        "get_recent_commits",
+        "get_deployments",
+        "search_runbooks"
+      ],
+      "required_evidence_sources": [
+        "logs",
+        "metrics",
+        "commits",
+        "deployments",
+        "operational_context"
+      ]
+    }
+  ],
+  "scoring_dimensions": [
+    "root_cause_accuracy",
+    "evidence_coverage",
+    "confidence_explainability",
+    "timeline_reconstruction",
+    "hypothesis_refinement"
+  ]
+}

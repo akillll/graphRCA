@@ -1,0 +1,130 @@
+[
+  {
+    "timestamp": "2026-03-18T15:50:00Z",
+    "level": "INFO",
+    "service": "tenant-migrator",
+    "component": "scheduler",
+    "message": "Tenant corp_azimuth moved to notification shard 7",
+    "trace_id": "mig-7001"
+  },
+  {
+    "timestamp": "2026-03-18T16:21:52Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollout",
+    "message": "Production deployment completed for notification-autoscaler version 2026.03.18.3",
+    "trace_id": "deploy-na31"
+  },
+  {
+    "timestamp": "2026-03-18T16:33:18Z",
+    "level": "INFO",
+    "service": "notification-worker",
+    "component": "email-sender",
+    "message": "provider=ses message_id=msg_290031 delivered in 601ms",
+    "trace_id": "ntf-290031"
+  },
+  {
+    "timestamp": "2026-03-18T16:42:21Z",
+    "level": "WARN",
+    "service": "notification-worker",
+    "component": "queue-consumer",
+    "message": "shard=7 oldest visible message age exceeded 120s",
+    "trace_id": "ntf-q72"
+  },
+  {
+    "timestamp": "2026-03-18T16:43:46Z",
+    "level": "WARN",
+    "service": "notification-worker",
+    "component": "push-sender",
+    "message": "shard=7 retrying APNS send after worker lease expired",
+    "trace_id": "ntf-291144"
+  },
+  {
+    "timestamp": "2026-03-18T16:45:04Z",
+    "level": "INFO",
+    "service": "notification-autoscaler",
+    "component": "decision-engine",
+    "message": "desired_replicas unchanged at 18; observed visible depth=118 threshold=200",
+    "trace_id": "hpa-9001"
+  },
+  {
+    "timestamp": "2026-03-18T16:47:28Z",
+    "level": "WARN",
+    "service": "notification-worker",
+    "component": "email-sender",
+    "message": "provider response slow for tenant corp_azimuth campaign send",
+    "trace_id": "ntf-291804"
+  },
+  {
+    "timestamp": "2026-03-18T16:49:51Z",
+    "level": "INFO",
+    "service": "ses-probe",
+    "component": "delivery-check",
+    "message": "SES probe delivered in 644ms",
+    "trace_id": "probe-ses-11"
+  },
+  {
+    "timestamp": "2026-03-18T16:52:37Z",
+    "level": "WARN",
+    "service": "notification-worker",
+    "component": "queue-consumer",
+    "message": "shard=7 poll returned 10 messages repeatedly while other shards remain mostly idle",
+    "trace_id": "ntf-q73"
+  },
+  {
+    "timestamp": "2026-03-18T16:57:02Z",
+    "level": "INFO",
+    "service": "notification-autoscaler",
+    "component": "decision-engine",
+    "message": "desired_replicas unchanged at 18; observed visible depth=124 threshold=200",
+    "trace_id": "hpa-9007"
+  },
+  {
+    "timestamp": "2026-03-18T17:03:19Z",
+    "level": "WARN",
+    "service": "notification-worker",
+    "component": "queue-consumer",
+    "message": "shard=7 message age now 488s",
+    "trace_id": "ntf-q75"
+  },
+  {
+    "timestamp": "2026-03-18T17:05:58Z",
+    "level": "INFO",
+    "service": "kafka-broker",
+    "component": "controller",
+    "message": "partition leadership balanced for notification-events",
+    "trace_id": "kfk-9910"
+  },
+  {
+    "timestamp": "2026-03-18T17:12:31Z",
+    "level": "WARN",
+    "service": "notification-autoscaler",
+    "component": "decision-engine",
+    "message": "aggregation mode=avg_per_shard visible depth sampled across 16 shards",
+    "trace_id": "hpa-9014"
+  },
+  {
+    "timestamp": "2026-03-18T17:17:10Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollback",
+    "message": "Rollback completed for notification-autoscaler version 2026.03.18.2",
+    "trace_id": "deploy-na36"
+  },
+  {
+    "timestamp": "2026-03-18T17:24:58Z",
+    "level": "INFO",
+    "service": "notification-autoscaler",
+    "component": "decision-engine",
+    "message": "Scaled notification-worker from 18 to 42 replicas on total backlog signal",
+    "trace_id": "hpa-9022"
+  },
+  {
+    "timestamp": "2026-03-18T17:30:44Z",
+    "level": "INFO",
+    "service": "notification-worker",
+    "component": "queue-consumer",
+    "message": "shard=7 oldest visible message age dropped below 45s",
+    "trace_id": "ntf-q77"
+  }
+]

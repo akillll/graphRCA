@@ -1,0 +1,31 @@
+{
+  "id": "medium_replica_lag_entitlements_2026_04_09",
+  "title": "Subscription access denials caused by stale reads from lagging replica",
+  "difficulty": "medium",
+  "service": "entitlements-api",
+  "severity": "sev-2",
+  "summary": "Customers intermittently lost access to newly purchased premium features. The application logs mostly showed not-found responses and occasional query timeouts, but the real RCA depends on connecting a read-routing deployment with write-heavy billing backfill activity that pushed replica lag high enough to serve stale subscription state.",
+  "start_time": "2026-04-09T02:11:00Z",
+  "end_time": "2026-04-09T03:02:00Z",
+  "tags": [
+    "replica-lag",
+    "stale-reads",
+    "billing",
+    "consistency",
+    "partial-failure"
+  ],
+  "primary_hypotheses": [
+    "cache issue",
+    "subscription write failure",
+    "replica lag",
+    "database saturation"
+  ],
+  "operational_context": [
+    "A scheduled invoice reconciliation backfill started at 01:55Z and increased write volume on the billing primary.",
+    "The entitlements API deployment at 02:03Z expanded replica-preferring reads for cache misses."
+  ],
+  "relevant_runbooks": [
+    "replica_lag.md",
+    "consistency_failures.md"
+  ]
+}

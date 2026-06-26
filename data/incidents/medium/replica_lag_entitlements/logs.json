@@ -1,0 +1,122 @@
+[
+  {
+    "timestamp": "2026-04-09T01:55:00Z",
+    "level": "INFO",
+    "service": "billing-reconciler",
+    "component": "scheduler",
+    "message": "Started nightly invoice reconciliation batch for 1.8M accounts",
+    "trace_id": "recon-3001"
+  },
+  {
+    "timestamp": "2026-04-09T02:03:28Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollout",
+    "message": "Production deployment completed for entitlements-api version 2026.04.09.2",
+    "trace_id": "deploy-ent91"
+  },
+  {
+    "timestamp": "2026-04-09T02:11:33Z",
+    "level": "WARN",
+    "service": "entitlements-api",
+    "component": "subscription-store",
+    "message": "account_id=acc_22191 subscription not found during feature gate evaluation",
+    "trace_id": "ent-42a1"
+  },
+  {
+    "timestamp": "2026-04-09T02:11:34Z",
+    "level": "ERROR",
+    "service": "entitlements-api",
+    "component": "http",
+    "message": "GET /v1/features/video-export 403 74ms",
+    "trace_id": "ent-42a1"
+  },
+  {
+    "timestamp": "2026-04-09T02:13:48Z",
+    "level": "INFO",
+    "service": "checkout-service",
+    "component": "orders",
+    "message": "purchase_id=po_73121 premium upgrade captured successfully",
+    "trace_id": "chk-73121"
+  },
+  {
+    "timestamp": "2026-04-09T02:14:10Z",
+    "level": "WARN",
+    "service": "entitlements-api",
+    "component": "cache",
+    "message": "cache miss for account_id=acc_22191 feature-set",
+    "trace_id": "ent-42b9"
+  },
+  {
+    "timestamp": "2026-04-09T02:14:11Z",
+    "level": "WARN",
+    "service": "entitlements-api",
+    "component": "db",
+    "message": "read replica query exceeded 400ms threshold",
+    "trace_id": "ent-42b9"
+  },
+  {
+    "timestamp": "2026-04-09T02:16:52Z",
+    "level": "INFO",
+    "service": "postgres-primary",
+    "component": "vacuum",
+    "message": "autoanalyze completed on invoice_ledgers",
+    "trace_id": "pg-5511"
+  },
+  {
+    "timestamp": "2026-04-09T02:19:45Z",
+    "level": "WARN",
+    "service": "entitlements-api",
+    "component": "subscription-store",
+    "message": "account_id=acc_22877 subscription state older than expected version",
+    "trace_id": "ent-4366"
+  },
+  {
+    "timestamp": "2026-04-09T02:21:06Z",
+    "level": "ERROR",
+    "service": "support-bot",
+    "component": "chatops",
+    "message": "Customer reports paid upgrades are not unlocking exports immediately",
+    "trace_id": "chat-8120"
+  },
+  {
+    "timestamp": "2026-04-09T02:24:12Z",
+    "level": "WARN",
+    "service": "entitlements-api",
+    "component": "cache",
+    "message": "cache refresh skipped because read source returned no active subscription rows",
+    "trace_id": "ent-43f2"
+  },
+  {
+    "timestamp": "2026-04-09T02:28:31Z",
+    "level": "INFO",
+    "service": "billing-reconciler",
+    "component": "writer",
+    "message": "Processed 420k accounts in reconciliation pass",
+    "trace_id": "recon-3001"
+  },
+  {
+    "timestamp": "2026-04-09T02:33:49Z",
+    "level": "WARN",
+    "service": "entitlements-api",
+    "component": "db",
+    "message": "read replica query canceled after client timeout",
+    "trace_id": "ent-44be"
+  },
+  {
+    "timestamp": "2026-04-09T02:41:13Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollback",
+    "message": "Rollback completed for entitlements-api version 2026.04.09.1",
+    "trace_id": "deploy-ent95"
+  },
+  {
+    "timestamp": "2026-04-09T02:47:44Z",
+    "level": "INFO",
+    "service": "entitlements-api",
+    "component": "http",
+    "message": "GET /v1/features/video-export 200 63ms",
+    "trace_id": "ent-47aa"
+  }
+]

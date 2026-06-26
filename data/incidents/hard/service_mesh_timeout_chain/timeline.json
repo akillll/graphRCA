@@ -1,0 +1,47 @@
+[
+  {
+    "timestamp": "2026-03-07T19:02:13Z",
+    "actor": "deploy-controller",
+    "event": "Mesh routing policy version 2026.03.07.2 completed rollout"
+  },
+  {
+    "timestamp": "2026-03-07T19:09:00Z",
+    "actor": "platform-ops",
+    "event": "Inventory maintenance reduced spare local endpoints in us-east-1b"
+  },
+  {
+    "timestamp": "2026-03-07T19:14:00Z",
+    "actor": "monitoring",
+    "event": "Checkout latency and 504 alerts fired across the purchase path"
+  },
+  {
+    "timestamp": "2026-03-07T19:22:00Z",
+    "actor": "oncall-engineer",
+    "event": "Payment provider was suspected first because failures surfaced at the final checkout step"
+  },
+  {
+    "timestamp": "2026-03-07T19:29:00Z",
+    "actor": "sre",
+    "event": "Payment probes stayed healthy while cross-zone routing and mesh retries climbed sharply"
+  },
+  {
+    "timestamp": "2026-03-07T19:38:00Z",
+    "actor": "checkout-team",
+    "event": "Inventory backpressure and duplicated reservation attempts were identified as secondary effects of mesh retry behavior"
+  },
+  {
+    "timestamp": "2026-03-07T19:52:00Z",
+    "actor": "incident-commander",
+    "event": "Team isolated the routing-policy rollout interacting with reduced local inventory capacity and approved rollback"
+  },
+  {
+    "timestamp": "2026-03-07T19:56:21Z",
+    "actor": "deploy-controller",
+    "event": "Rollback to mesh routing policy version 2026.03.07.1 completed"
+  },
+  {
+    "timestamp": "2026-03-07T20:06:00Z",
+    "actor": "monitoring",
+    "event": "Checkout success and service latencies recovered as retry rate and cross-zone routing fell"
+  }
+]

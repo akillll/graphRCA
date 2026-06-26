@@ -1,0 +1,162 @@
+[
+  {
+    "timestamp": "2026-05-03T16:48:00Z",
+    "level": "INFO",
+    "service": "shard-balancer",
+    "component": "rebalance",
+    "message": "Started scheduled shard rebalance across gateway node groups",
+    "trace_id": "bal-8801"
+  },
+  {
+    "timestamp": "2026-05-03T16:57:19Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollout",
+    "message": "Production deployment completed for realtime-gateway version 2026.05.03.6",
+    "trace_id": "deploy-gw601"
+  },
+  {
+    "timestamp": "2026-05-03T17:05:44Z",
+    "level": "WARN",
+    "service": "edge-proxy",
+    "component": "envoy",
+    "message": "upstream disconnects above baseline on websocket cluster",
+    "trace_id": "edge-4112"
+  },
+  {
+    "timestamp": "2026-05-03T17:06:08Z",
+    "level": "WARN",
+    "service": "realtime-gateway",
+    "component": "resume-handler",
+    "message": "session_id=s_88211 rejected resume attempt due to generation mismatch expected=188 seen=187",
+    "trace_id": "gw-88211"
+  },
+  {
+    "timestamp": "2026-05-03T17:06:09Z",
+    "level": "INFO",
+    "service": "realtime-gateway",
+    "component": "connection-manager",
+    "message": "closing websocket with code 4009 require full reconnect",
+    "trace_id": "gw-88211"
+  },
+  {
+    "timestamp": "2026-05-03T17:07:11Z",
+    "level": "WARN",
+    "service": "auth-api",
+    "component": "token-introspection",
+    "message": "validation latency exceeded 900ms p95 budget",
+    "trace_id": "auth-7712"
+  },
+  {
+    "timestamp": "2026-05-03T17:07:40Z",
+    "level": "WARN",
+    "service": "session-store",
+    "component": "redis-client",
+    "message": "pipeline timeout waiting for GET session:s_88211",
+    "trace_id": "ss-9011"
+  },
+  {
+    "timestamp": "2026-05-03T17:08:25Z",
+    "level": "INFO",
+    "service": "edge-probe",
+    "component": "network",
+    "message": "regional packet loss remains below 0.2 percent",
+    "trace_id": "probe-edge-11"
+  },
+  {
+    "timestamp": "2026-05-03T17:09:02Z",
+    "level": "WARN",
+    "service": "realtime-gateway",
+    "component": "resume-handler",
+    "message": "session_id=s_88533 stale resume nonce after shard transfer",
+    "trace_id": "gw-88533"
+  },
+  {
+    "timestamp": "2026-05-03T17:09:03Z",
+    "level": "ERROR",
+    "service": "realtime-gateway",
+    "component": "http-upgrade",
+    "message": "websocket identify throttled because concurrent identify budget exhausted",
+    "trace_id": "gw-88533"
+  },
+  {
+    "timestamp": "2026-05-03T17:10:16Z",
+    "level": "INFO",
+    "service": "shard-balancer",
+    "component": "rebalance",
+    "message": "gateway shard transfers completed for 184 shards",
+    "trace_id": "bal-8801"
+  },
+  {
+    "timestamp": "2026-05-03T17:11:57Z",
+    "level": "WARN",
+    "service": "auth-api",
+    "component": "rate-limiter",
+    "message": "anonymous identify fallback burst exceeded limiter in one-minute window",
+    "trace_id": "auth-7734"
+  },
+  {
+    "timestamp": "2026-05-03T17:12:33Z",
+    "level": "INFO",
+    "service": "session-store",
+    "component": "redis-server",
+    "message": "background save terminated with success",
+    "trace_id": "redis-9912"
+  },
+  {
+    "timestamp": "2026-05-03T17:14:11Z",
+    "level": "WARN",
+    "service": "realtime-gateway",
+    "component": "fanout-worker",
+    "message": "presence diff publish delayed because outbound queue depth exceeded 20000",
+    "trace_id": "gw-queue-51"
+  },
+  {
+    "timestamp": "2026-05-03T17:16:19Z",
+    "level": "ERROR",
+    "service": "client-relay",
+    "component": "notifications",
+    "message": "delivery lagging because gateway session attach rate dropped below threshold",
+    "trace_id": "relay-2211"
+  },
+  {
+    "timestamp": "2026-05-03T17:18:07Z",
+    "level": "WARN",
+    "service": "session-store",
+    "component": "redis-client",
+    "message": "MGET session pipeline retries exhausted on shard shard-12",
+    "trace_id": "ss-9044"
+  },
+  {
+    "timestamp": "2026-05-03T17:22:54Z",
+    "level": "INFO",
+    "service": "oncall-bot",
+    "component": "chatops",
+    "message": "Initial speculation centers on regional edge instability due to widespread websocket disconnects",
+    "trace_id": "chat-5501"
+  },
+  {
+    "timestamp": "2026-05-03T17:31:48Z",
+    "level": "WARN",
+    "service": "realtime-gateway",
+    "component": "resume-handler",
+    "message": "resume rejection ratio remains high for sessions touched during rebalance window",
+    "trace_id": "gw-agg-77"
+  },
+  {
+    "timestamp": "2026-05-03T17:43:26Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollback",
+    "message": "Rollback completed for realtime-gateway version 2026.05.03.5",
+    "trace_id": "deploy-gw606"
+  },
+  {
+    "timestamp": "2026-05-03T17:49:03Z",
+    "level": "INFO",
+    "service": "realtime-gateway",
+    "component": "connection-manager",
+    "message": "identify success ratio recovered above 96 percent",
+    "trace_id": "gw-rec-11"
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "deployment_id": "gateway-rebalance-8801",
+    "timestamp": "2026-05-03T16:48:00Z",
+    "service": "shard-balancer",
+    "environment": "production",
+    "version": "scheduled-evening-rebalance",
+    "strategy": "maintenance-operation",
+    "status": "started",
+    "initiated_by": "platform-ops"
+  },
+  {
+    "deployment_id": "gateway-prod-6001",
+    "timestamp": "2026-05-03T16:57:19Z",
+    "service": "realtime-gateway",
+    "environment": "production",
+    "version": "2026.05.03.6",
+    "strategy": "rolling",
+    "status": "completed",
+    "initiated_by": "argo-rollouts"
+  },
+  {
+    "deployment_id": "gateway-prod-6002",
+    "timestamp": "2026-05-03T17:41:10Z",
+    "service": "realtime-gateway",
+    "environment": "production",
+    "version": "2026.05.03.5",
+    "strategy": "rollback",
+    "status": "completed",
+    "initiated_by": "incident-commander"
+  }
+]

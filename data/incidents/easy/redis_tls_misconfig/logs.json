@@ -1,0 +1,114 @@
+[
+  {
+    "timestamp": "2026-02-11T09:36:12Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollout",
+    "message": "Production deployment completed for session-api version 2026.02.11.7",
+    "trace_id": "deploy-r441"
+  },
+  {
+    "timestamp": "2026-02-11T09:39:41Z",
+    "level": "INFO",
+    "service": "session-api",
+    "component": "http",
+    "message": "POST /v1/sessions 201 41ms",
+    "trace_id": "sess-0193"
+  },
+  {
+    "timestamp": "2026-02-11T09:41:08Z",
+    "level": "WARN",
+    "service": "session-api",
+    "component": "redis-client",
+    "message": "read tcp 10.12.41.28:48032->10.4.19.11:6379: read: connection reset by peer",
+    "trace_id": "sess-020c"
+  },
+  {
+    "timestamp": "2026-02-11T09:41:08Z",
+    "level": "ERROR",
+    "service": "session-api",
+    "component": "session-store",
+    "message": "failed to persist session token: remote error: tls: handshake failure",
+    "trace_id": "sess-020c"
+  },
+  {
+    "timestamp": "2026-02-11T09:41:09Z",
+    "level": "ERROR",
+    "service": "session-api",
+    "component": "http",
+    "message": "POST /v1/sessions 503 67ms",
+    "trace_id": "sess-020c"
+  },
+  {
+    "timestamp": "2026-02-11T09:42:54Z",
+    "level": "WARN",
+    "service": "session-api",
+    "component": "redis-client",
+    "message": "dial redis: EOF during startup handshake",
+    "trace_id": "sess-0258"
+  },
+  {
+    "timestamp": "2026-02-11T09:44:03Z",
+    "level": "INFO",
+    "service": "redis-cache-b",
+    "component": "server",
+    "message": "Accepted 152 client connections in last minute",
+    "trace_id": "redis-900a"
+  },
+  {
+    "timestamp": "2026-02-11T09:45:49Z",
+    "level": "WARN",
+    "service": "edge-proxy",
+    "component": "envoy",
+    "message": "upstream_rq_5xx from session-api exceeded 12 percent",
+    "trace_id": "edge-22fd"
+  },
+  {
+    "timestamp": "2026-02-11T09:47:20Z",
+    "level": "INFO",
+    "service": "auth-worker",
+    "component": "oauth",
+    "message": "Refreshed provider JWKS cache",
+    "trace_id": "auth-18ba"
+  },
+  {
+    "timestamp": "2026-02-11T09:48:44Z",
+    "level": "ERROR",
+    "service": "session-api",
+    "component": "session-store",
+    "message": "redis SETEX failed: remote error: tls: handshake failure",
+    "trace_id": "sess-031d"
+  },
+  {
+    "timestamp": "2026-02-11T09:49:12Z",
+    "level": "WARN",
+    "service": "session-api",
+    "component": "fallback",
+    "message": "Skipping local in-memory fallback because sticky sessions disabled",
+    "trace_id": "sess-0330"
+  },
+  {
+    "timestamp": "2026-02-11T09:52:30Z",
+    "level": "INFO",
+    "service": "redis-cache-b",
+    "component": "replication",
+    "message": "Replication offset steady; no failover in progress",
+    "trace_id": "redis-90ef"
+  },
+  {
+    "timestamp": "2026-02-11T09:59:08Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollback",
+    "message": "Rollback completed for session-api version 2026.02.11.6",
+    "trace_id": "deploy-r445"
+  },
+  {
+    "timestamp": "2026-02-11T10:01:57Z",
+    "level": "INFO",
+    "service": "session-api",
+    "component": "http",
+    "message": "POST /v1/sessions 201 39ms",
+    "trace_id": "sess-0411"
+  }
+]

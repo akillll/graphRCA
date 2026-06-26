@@ -1,0 +1,25 @@
+{
+  "id": "easy_cache_warmup_regression_2026_04_21",
+  "title": "Catalog API read latency increase after cache TTL regression",
+  "difficulty": "easy",
+  "service": "catalog-api",
+  "severity": "sev-2",
+  "summary": "Catalog reads slowed down after a routine rollout. Logs point at Redis misses and some slow database queries, but the root cause depends on correlating a cache behavior change with deployment timing and downstream database pressure.",
+  "start_time": "2026-04-21T13:12:00Z",
+  "end_time": "2026-04-21T13:47:00Z",
+  "tags": [
+    "cache",
+    "redis",
+    "database",
+    "latency",
+    "configuration"
+  ],
+  "primary_hypotheses": [
+    "redis outage",
+    "database regression",
+    "cache churn from application change"
+  ],
+  "relevant_runbooks": [
+    "cache_degradation.md"
+  ]
+}

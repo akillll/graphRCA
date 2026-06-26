@@ -1,0 +1,22 @@
+[
+  {
+    "deployment_id": "checkout-prod-8801",
+    "timestamp": "2026-05-14T15:59:22Z",
+    "service": "checkout-api",
+    "environment": "production",
+    "version": "2026.05.14.3",
+    "strategy": "rolling",
+    "status": "completed",
+    "initiated_by": "argo-rollouts"
+  },
+  {
+    "deployment_id": "checkout-prod-8802",
+    "timestamp": "2026-05-14T16:29:54Z",
+    "service": "checkout-api",
+    "environment": "production",
+    "version": "2026.05.14.2",
+    "strategy": "rollback",
+    "status": "completed",
+    "initiated_by": "incident-commander"
+  }
+]

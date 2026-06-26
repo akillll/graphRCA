@@ -1,0 +1,114 @@
+[
+  {
+    "timestamp": "2026-02-27T08:05:00Z",
+    "level": "INFO",
+    "service": "cluster-autoscaler",
+    "component": "nodegroup",
+    "message": "Started node rotation for app-general-us-east-1c",
+    "trace_id": "asg-1c-100"
+  },
+  {
+    "timestamp": "2026-02-27T08:17:24Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollout",
+    "message": "Production deployment completed for auth-network-policy version 2026.02.27.1",
+    "trace_id": "deploy-net77"
+  },
+  {
+    "timestamp": "2026-02-27T08:24:12Z",
+    "level": "WARN",
+    "service": "auth-api",
+    "component": "token-introspection-client",
+    "message": "dial tcp 10.62.18.44:8443: i/o timeout",
+    "trace_id": "auth-8811"
+  },
+  {
+    "timestamp": "2026-02-27T08:24:13Z",
+    "level": "ERROR",
+    "service": "auth-api",
+    "component": "http",
+    "message": "POST /v1/token/refresh 503 1506ms",
+    "trace_id": "auth-8811"
+  },
+  {
+    "timestamp": "2026-02-27T08:25:48Z",
+    "level": "INFO",
+    "service": "identity-probe",
+    "component": "synthetic-check",
+    "message": "token introspection probe from us-east-1a succeeded in 112ms",
+    "trace_id": "probe-id-11"
+  },
+  {
+    "timestamp": "2026-02-27T08:27:03Z",
+    "level": "WARN",
+    "service": "auth-api",
+    "component": "token-introspection-client",
+    "message": "mTLS handshake not completed before upstream timeout",
+    "trace_id": "auth-8824"
+  },
+  {
+    "timestamp": "2026-02-27T08:31:55Z",
+    "level": "INFO",
+    "service": "mesh-sidecar",
+    "component": "envoy",
+    "message": "cluster token-introspection-service healthy endpoints=12",
+    "trace_id": "mesh-9912"
+  },
+  {
+    "timestamp": "2026-02-27T08:34:17Z",
+    "level": "WARN",
+    "service": "auth-api",
+    "component": "request-router",
+    "message": "pod auth-api-66bb8d9559-2n6pw zone=us-east-1c retry budget exhausted for token introspection",
+    "trace_id": "auth-8841"
+  },
+  {
+    "timestamp": "2026-02-27T08:38:09Z",
+    "level": "INFO",
+    "service": "identity-probe",
+    "component": "synthetic-check",
+    "message": "token introspection probe from us-east-1b succeeded in 109ms",
+    "trace_id": "probe-id-13"
+  },
+  {
+    "timestamp": "2026-02-27T08:41:52Z",
+    "level": "WARN",
+    "service": "cni-agent",
+    "component": "policy",
+    "message": "dropped egress packet namespace=auth dst=10.62.18.44:8443 zone=us-east-1c policy=auth-egress-restrict",
+    "trace_id": "cni-4501"
+  },
+  {
+    "timestamp": "2026-02-27T08:45:26Z",
+    "level": "INFO",
+    "service": "support-bot",
+    "component": "chatops",
+    "message": "Customer support reports intermittent login failures, mostly from enterprise tenants",
+    "trace_id": "chat-891b"
+  },
+  {
+    "timestamp": "2026-02-27T08:48:33Z",
+    "level": "WARN",
+    "service": "auth-api",
+    "component": "token-introspection-client",
+    "message": "dial tcp 10.62.18.44:8443: i/o timeout",
+    "trace_id": "auth-8877"
+  },
+  {
+    "timestamp": "2026-02-27T08:53:40Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollback",
+    "message": "Rollback completed for auth-network-policy version 2026.02.26.9",
+    "trace_id": "deploy-net81"
+  },
+  {
+    "timestamp": "2026-02-27T08:58:47Z",
+    "level": "INFO",
+    "service": "auth-api",
+    "component": "http",
+    "message": "POST /v1/token/refresh 200 91ms",
+    "trace_id": "auth-8912"
+  }
+]

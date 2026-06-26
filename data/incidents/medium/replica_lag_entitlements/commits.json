@@ -1,0 +1,30 @@
+[
+  {
+    "commit_id": "d8e0f14",
+    "author": "akim",
+    "timestamp": "2026-04-09T01:31:05Z",
+    "message": "Prefer replica for entitlement reads on cache miss to reduce primary pressure",
+    "files_changed": [
+      "src/entitlements/read_router.go",
+      "config/entitlements/database.yml"
+    ]
+  },
+  {
+    "commit_id": "6f11c7a",
+    "author": "nmarin",
+    "timestamp": "2026-04-09T01:34:41Z",
+    "message": "Add version watermark logging for stale entitlement payloads",
+    "files_changed": [
+      "src/entitlements/store.go"
+    ]
+  },
+  {
+    "commit_id": "729d5be",
+    "author": "billing-bot",
+    "timestamp": "2026-04-08T22:10:00Z",
+    "message": "Schedule nightly reconciliation batch after invoice schema backfill",
+    "files_changed": [
+      "ops/billing/reconciliation_cron.yaml"
+    ]
+  }
+]

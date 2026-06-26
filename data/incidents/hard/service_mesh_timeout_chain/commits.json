@@ -1,0 +1,29 @@
+[
+  {
+    "commit_id": "92ac103",
+    "author": "mesh-team",
+    "timestamp": "2026-03-07T18:37:18Z",
+    "message": "Prefer cross-zone fallback earlier when local endpoint set falls below soft threshold",
+    "files_changed": [
+      "mesh/routing/zone_failover.yaml"
+    ]
+  },
+  {
+    "commit_id": "4f1d201",
+    "author": "mesh-team",
+    "timestamp": "2026-03-07T18:40:04Z",
+    "message": "Increase upstream retry budget for latency-sensitive checkout calls",
+    "files_changed": [
+      "mesh/policies/checkout-retries.yaml"
+    ]
+  },
+  {
+    "commit_id": "bc7a9e8",
+    "author": "inventory-ops",
+    "timestamp": "2026-03-07T17:55:00Z",
+    "message": "Drain two us-east-1b inventory pods for kernel patch window",
+    "files_changed": [
+      "ops/maintenance/inventory-1b.yaml"
+    ]
+  }
+]

@@ -1,0 +1,31 @@
+{
+  "id": "medium_az_egress_policy_regression_2026_02_27",
+  "title": "Intermittent auth failures isolated to one availability zone after egress policy change",
+  "difficulty": "medium",
+  "service": "auth-api",
+  "severity": "sev-2",
+  "summary": "Login and token refresh requests failed intermittently, but only for a subset of pods. The surface symptom looked like a flaky downstream identity provider, yet the actual RCA requires correlating AZ-scoped error concentration, healthy dependency probes, and a network policy rollout that blocked mTLS egress from nodes in one zone.",
+  "start_time": "2026-02-27T08:24:00Z",
+  "end_time": "2026-02-27T09:06:00Z",
+  "tags": [
+    "network-policy",
+    "availability-zone",
+    "partial-failure",
+    "auth",
+    "egress"
+  ],
+  "primary_hypotheses": [
+    "identity provider outage",
+    "service mesh issue",
+    "az-specific network policy regression",
+    "node pressure"
+  ],
+  "operational_context": [
+    "A node rotation at 08:05Z shifted more auth-api pods into availability zone us-east-1c.",
+    "A network policy deployment at 08:17Z tightened east-west and egress destinations for workloads using the auth namespace."
+  ],
+  "relevant_runbooks": [
+    "partial_dependency_failure.md",
+    "network_policy.md"
+  ]
+}

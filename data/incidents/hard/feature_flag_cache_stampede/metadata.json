@@ -1,0 +1,39 @@
+{
+  "id": "hard_feature_flag_cache_stampede_2026_04_14",
+  "title": "Control-plane cache stampede cascaded into stale configuration and API failures",
+  "difficulty": "hard",
+  "service": "feature-flag-control-plane",
+  "severity": "sev-1",
+  "summary": "Flag evaluations and config fetches failed across multiple product surfaces after a control-plane incident. The outage looked like a database problem from some dashboards and a CDN glitch from others, but the actual chain requires reasoning from cache invalidation behavior, control-plane rollout timing, database fanout, and repeated client retries across several services.",
+  "start_time": "2026-04-14T13:08:00Z",
+  "end_time": "2026-04-14T14:27:00Z",
+  "tags": [
+    "cache-stampede",
+    "control-plane",
+    "database",
+    "retry-amplification",
+    "cascading-failure"
+  ],
+  "primary_hypotheses": [
+    "primary database regression",
+    "cdn config propagation issue",
+    "feature flag cache stampede with downstream overload",
+    "client retry amplification"
+  ],
+  "operational_context": [
+    "A product launch at 13:00Z caused a broad increase in feature flag lookups for anonymous traffic.",
+    "The control-plane deployment at 12:56Z changed cache invalidation granularity for namespace-level updates."
+  ],
+  "affected_services": [
+    "feature-flag-control-plane",
+    "config-cache",
+    "postgres-primary",
+    "api-edge",
+    "experimentation-sdk-ingress"
+  ],
+  "relevant_runbooks": [
+    "cache_stampede.md",
+    "control_plane_overload.md",
+    "distributed_timeout_chain.md"
+  ]
+}

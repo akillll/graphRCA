@@ -1,0 +1,30 @@
+[
+  {
+    "commit_id": "5bca9f3",
+    "author": "rina",
+    "timestamp": "2026-04-14T12:18:22Z",
+    "message": "Collapse namespace-level flag updates into wildcard cache invalidations",
+    "files_changed": [
+      "src/flags/invalidation_dispatcher.go",
+      "src/cache/namespace_index.go"
+    ]
+  },
+  {
+    "commit_id": "f104dd8",
+    "author": "rina",
+    "timestamp": "2026-04-14T12:20:09Z",
+    "message": "Bypass singleflight dedupe for oversized namespace fanout sets",
+    "files_changed": [
+      "src/cache/fill_coordinator.go"
+    ]
+  },
+  {
+    "commit_id": "6d22a4c",
+    "author": "growth-bot",
+    "timestamp": "2026-04-14T11:40:00Z",
+    "message": "Enable spring launch traffic policy for public-web surfaces",
+    "files_changed": [
+      "ops/launches/spring_launch.yaml"
+    ]
+  }
+]

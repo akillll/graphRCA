@@ -1,0 +1,130 @@
+[
+  {
+    "timestamp": "2026-04-14T12:56:41Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollout",
+    "message": "Production deployment completed for feature-flag-control-plane version 2026.04.14.4",
+    "trace_id": "deploy-ff401"
+  },
+  {
+    "timestamp": "2026-04-14T13:00:00Z",
+    "level": "INFO",
+    "service": "launch-orchestrator",
+    "component": "campaign",
+    "message": "Spring launch traffic policy enabled for homepage and signup flows",
+    "trace_id": "launch-1901"
+  },
+  {
+    "timestamp": "2026-04-14T13:08:16Z",
+    "level": "WARN",
+    "service": "feature-flag-control-plane",
+    "component": "cache",
+    "message": "namespace=checkout invalidated 48112 keys due to wildcard change event",
+    "trace_id": "ff-8102"
+  },
+  {
+    "timestamp": "2026-04-14T13:08:19Z",
+    "level": "WARN",
+    "service": "config-cache",
+    "component": "redis-client",
+    "message": "GET batch miss ratio exceeded 70 percent",
+    "trace_id": "cache-4101"
+  },
+  {
+    "timestamp": "2026-04-14T13:09:41Z",
+    "level": "WARN",
+    "service": "feature-flag-control-plane",
+    "component": "db-loader",
+    "message": "namespace=checkout query fanout exceeded expected shard count",
+    "trace_id": "ff-8111"
+  },
+  {
+    "timestamp": "2026-04-14T13:10:44Z",
+    "level": "INFO",
+    "service": "api-edge",
+    "component": "client-cache",
+    "message": "serving last-known-good flags for tenant=public-web after upstream timeout",
+    "trace_id": "edge-6220"
+  },
+  {
+    "timestamp": "2026-04-14T13:12:07Z",
+    "level": "ERROR",
+    "service": "feature-flag-control-plane",
+    "component": "http",
+    "message": "GET /v1/flags/resolve 503 2408ms",
+    "trace_id": "ff-8128"
+  },
+  {
+    "timestamp": "2026-04-14T13:13:33Z",
+    "level": "INFO",
+    "service": "postgres-primary",
+    "component": "bgwriter",
+    "message": "checkpoint complete",
+    "trace_id": "pg-7012"
+  },
+  {
+    "timestamp": "2026-04-14T13:15:20Z",
+    "level": "WARN",
+    "service": "experimentation-sdk-ingress",
+    "component": "retry-layer",
+    "message": "resolve retries increased for anonymous session bootstrap",
+    "trace_id": "sdk-2201"
+  },
+  {
+    "timestamp": "2026-04-14T13:17:04Z",
+    "level": "WARN",
+    "service": "feature-flag-control-plane",
+    "component": "cache",
+    "message": "singleflight dedupe bypassed because namespace key cardinality exceeded budget",
+    "trace_id": "ff-8141"
+  },
+  {
+    "timestamp": "2026-04-14T13:19:50Z",
+    "level": "INFO",
+    "service": "cdn-probe",
+    "component": "synthetic",
+    "message": "static config manifest latency normal at 86ms",
+    "trace_id": "cdn-1108"
+  },
+  {
+    "timestamp": "2026-04-14T13:24:18Z",
+    "level": "WARN",
+    "service": "api-edge",
+    "component": "router",
+    "message": "homepage rendering degraded due to stale flag defaults on 19 percent of requests",
+    "trace_id": "edge-6234"
+  },
+  {
+    "timestamp": "2026-04-14T13:32:55Z",
+    "level": "WARN",
+    "service": "feature-flag-control-plane",
+    "component": "db-loader",
+    "message": "connection acquisition over 1s threshold",
+    "trace_id": "ff-8188"
+  },
+  {
+    "timestamp": "2026-04-14T13:41:22Z",
+    "level": "INFO",
+    "service": "ops-bot",
+    "component": "chatops",
+    "message": "Some teams suspect primary PostgreSQL issues because CPU and lock waits are elevated",
+    "trace_id": "chat-cc01"
+  },
+  {
+    "timestamp": "2026-04-14T13:56:36Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollback",
+    "message": "Rollback completed for feature-flag-control-plane version 2026.04.14.3",
+    "trace_id": "deploy-ff406"
+  },
+  {
+    "timestamp": "2026-04-14T14:04:14Z",
+    "level": "INFO",
+    "service": "feature-flag-control-plane",
+    "component": "cache",
+    "message": "namespace resolve cache hit ratio recovered above 92 percent",
+    "trace_id": "ff-rec-12"
+  }
+]

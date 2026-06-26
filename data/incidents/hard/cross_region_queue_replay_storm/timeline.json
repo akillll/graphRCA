@@ -1,0 +1,42 @@
+[
+  {
+    "timestamp": "2026-01-18T05:58:12Z",
+    "actor": "deploy-controller",
+    "event": "event-ingestion-consumer version 2026.01.18.3 completed rollout"
+  },
+  {
+    "timestamp": "2026-01-18T06:11:00Z",
+    "actor": "incident-automation",
+    "event": "Event ingestion traffic shifted to the secondary region after primary-region network instability"
+  },
+  {
+    "timestamp": "2026-01-18T06:22:00Z",
+    "actor": "monitoring",
+    "event": "Duplicate event candidate alerts fired as downstream queue depth began climbing"
+  },
+  {
+    "timestamp": "2026-01-18T06:33:00Z",
+    "actor": "oncall-engineer",
+    "event": "Initial investigation focused on whether producers were publishing duplicates during failover"
+  },
+  {
+    "timestamp": "2026-01-18T06:44:00Z",
+    "actor": "sre",
+    "event": "Producer duplicate metrics stayed flat while checkpoint epoch divergence and dedup-cache pressure kept rising"
+  },
+  {
+    "timestamp": "2026-01-18T06:56:00Z",
+    "actor": "streaming-team",
+    "event": "Recent consumer failover recovery changes were tied to mirrored checkpoint restoration and deferred writes"
+  },
+  {
+    "timestamp": "2026-01-18T07:06:04Z",
+    "actor": "deploy-controller",
+    "event": "Rollback to event-ingestion-consumer version 2026.01.18.2 completed"
+  },
+  {
+    "timestamp": "2026-01-18T07:18:00Z",
+    "actor": "monitoring",
+    "event": "Checkpoint epochs converged and duplicate rates plus downstream queue depth began recovering"
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "deployment_id": "catalog-prod-6107",
+    "timestamp": "2026-04-21T13:04:58Z",
+    "service": "catalog-api",
+    "environment": "production",
+    "version": "2026.04.21.5",
+    "strategy": "rolling",
+    "status": "completed",
+    "initiated_by": "argo-rollouts"
+  },
+  {
+    "deployment_id": "catalog-prod-6108",
+    "timestamp": "2026-04-21T13:33:40Z",
+    "service": "catalog-api",
+    "environment": "production",
+    "version": "2026.04.21.4",
+    "strategy": "rollback",
+    "status": "completed",
+    "initiated_by": "catalog-oncall"
+  }
+]

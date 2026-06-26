@@ -1,0 +1,50 @@
+{
+  "root_cause": "Media-worker version 2026.05.22.4 introduced a memory leak in the image metadata parsing path by reusing decode context across derivative generation. Under slightly elevated upload volume from the profile refresh campaign, retained heap grew steadily until pods were OOM-killed, which reduced effective worker capacity and caused a sustained processing backlog.",
+  "confidence": "high",
+  "evidence_sources": [
+    {
+      "source": "logs",
+      "details": [
+        "Workers emit repeated heap watermark warnings before kubelet reports OOMKilled terminations",
+        "S3 requests remain fast, which weakens the object-storage hypothesis"
+      ]
+    },
+    {
+      "source": "metrics",
+      "details": [
+        "memory_rss_p95_mb rises monotonically from 441MB to 944MB while queue depth and restarts climb",
+        "s3_gateway.p95_latency_ms stays flat, partially eliminating storage latency as the primary cause"
+      ]
+    },
+    {
+      "source": "commits",
+      "details": [
+        "Commit 5cd88a1 changed EXIF decode context reuse in the deployed build",
+        "Commit 0e4a7dd increased variant fanout, amplifying the leak's impact"
+      ]
+    },
+    {
+      "source": "deployments",
+      "details": [
+        "Impact starts after media-prod-2201 and improves after rollback media-prod-2202"
+      ]
+    },
+    {
+      "source": "operational_context",
+      "details": [
+        "The profile refresh campaign increased load enough to expose the leak faster, but traffic alone does not explain the restart pattern"
+      ]
+    }
+  ],
+  "recommended_actions": [
+    "Revert the decode-context reuse change and add heap profiling coverage for large-image paths",
+    "Add alerts on monotonic per-pod RSS growth and restart acceleration before queue depth becomes severe",
+    "Load test media-worker using campaign-like upload mixes before enabling higher variant fanout"
+  ],
+  "expected_investigation_path": [
+    "Inspect queue backlog and worker error symptoms in logs",
+    "Compare worker memory, restart, CPU, and storage latency metrics to refine the hypothesis",
+    "Review recent media pipeline commits for retained-memory risk",
+    "Correlate the deployment with onset while accounting for the traffic campaign as contributing operational context"
+  ]
+}

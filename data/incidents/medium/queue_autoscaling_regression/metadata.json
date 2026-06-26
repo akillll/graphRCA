@@ -1,0 +1,31 @@
+{
+  "id": "medium_queue_autoscaling_regression_2026_03_18",
+  "title": "Notification delivery delays caused by autoscaler undercounting hot shard backlog",
+  "difficulty": "medium",
+  "service": "notification-worker",
+  "severity": "sev-2",
+  "summary": "Push notifications and emails were delayed for a subset of tenants. Logs showed retries and worker timeouts, but the true cause requires correlating shard-skewed queue growth with an autoscaler change that watched the wrong queue metric after a tenant migration increased load on one shard.",
+  "start_time": "2026-03-18T16:42:00Z",
+  "end_time": "2026-03-18T17:34:00Z",
+  "tags": [
+    "autoscaling",
+    "queues",
+    "sharding",
+    "backlog",
+    "partial-degradation"
+  ],
+  "primary_hypotheses": [
+    "provider delivery slowdown",
+    "worker CPU saturation",
+    "queue autoscaling regression",
+    "hot shard after tenant migration"
+  ],
+  "operational_context": [
+    "A large enterprise tenant migration completed at 15:50Z and concentrated notification load onto shard 7.",
+    "The notification autoscaler deployment at 16:21Z switched from total queue depth to per-shard visible depth aggregation."
+  ],
+  "relevant_runbooks": [
+    "queue_scaling.md",
+    "notification_backlog.md"
+  ]
+}

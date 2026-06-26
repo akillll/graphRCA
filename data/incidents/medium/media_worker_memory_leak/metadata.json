@@ -1,0 +1,31 @@
+{
+  "id": "medium_media_worker_memory_leak_2026_05_22",
+  "title": "Image processing backlog driven by gradual worker memory leak",
+  "difficulty": "medium",
+  "service": "media-worker",
+  "severity": "sev-2",
+  "summary": "Photo and avatar processing latency increased over nearly an hour, eventually causing backlog growth and delayed notifications. The visible failures looked like generic worker saturation, but the root cause requires correlating gradual per-pod memory growth, container restarts, and a rollout that changed image metadata parsing behavior under elevated upload volume.",
+  "start_time": "2026-05-22T11:18:00Z",
+  "end_time": "2026-05-22T12:26:00Z",
+  "tags": [
+    "memory-leak",
+    "workers",
+    "queue-backlog",
+    "image-processing",
+    "autoscaling"
+  ],
+  "primary_hypotheses": [
+    "upload traffic surge",
+    "object storage latency",
+    "worker memory growth",
+    "insufficient scaling"
+  ],
+  "operational_context": [
+    "A profile-photo refresh campaign started at 10:30Z and increased upload traffic by roughly 18 percent.",
+    "The media-worker deployment at 11:02Z included image metadata parsing changes and larger thumbnail fanout."
+  ],
+  "relevant_runbooks": [
+    "memory_leak.md",
+    "worker_backlog.md"
+  ]
+}

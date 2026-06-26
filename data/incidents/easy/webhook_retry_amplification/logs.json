@@ -1,0 +1,122 @@
+[
+  {
+    "timestamp": "2026-03-03T18:19:44Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollout",
+    "message": "Production deployment completed for webhook-dispatcher version 2026.03.03.2",
+    "trace_id": "deploy-w301"
+  },
+  {
+    "timestamp": "2026-03-03T18:23:10Z",
+    "level": "INFO",
+    "service": "webhook-dispatcher",
+    "component": "worker",
+    "message": "delivery_id=wh_80091 partner=payroll-sync status=success duration_ms=812",
+    "trace_id": "wh-80091"
+  },
+  {
+    "timestamp": "2026-03-03T18:26:17Z",
+    "level": "WARN",
+    "service": "webhook-dispatcher",
+    "component": "delivery-client",
+    "message": "delivery_id=wh_80142 partner=payroll-sync upstream timeout after 2000ms",
+    "trace_id": "wh-80142"
+  },
+  {
+    "timestamp": "2026-03-03T18:26:18Z",
+    "level": "INFO",
+    "service": "webhook-dispatcher",
+    "component": "retry-scheduler",
+    "message": "delivery_id=wh_80142 requeued with backoff=5s attempt=2",
+    "trace_id": "wh-80142"
+  },
+  {
+    "timestamp": "2026-03-03T18:27:54Z",
+    "level": "WARN",
+    "service": "webhook-dispatcher",
+    "component": "delivery-client",
+    "message": "delivery_id=wh_80167 partner=payroll-sync upstream timeout after 2001ms",
+    "trace_id": "wh-80167"
+  },
+  {
+    "timestamp": "2026-03-03T18:28:02Z",
+    "level": "INFO",
+    "service": "webhook-dispatcher",
+    "component": "worker",
+    "message": "delivery_id=wh_80170 partner=inventory-sync status=success duration_ms=644",
+    "trace_id": "wh-80170"
+  },
+  {
+    "timestamp": "2026-03-03T18:29:12Z",
+    "level": "WARN",
+    "service": "webhook-dispatcher",
+    "component": "queue",
+    "message": "delivery backlog exceeded 500 jobs",
+    "trace_id": "queue-1f2a"
+  },
+  {
+    "timestamp": "2026-03-03T18:31:45Z",
+    "level": "ERROR",
+    "service": "webhook-dispatcher",
+    "component": "worker",
+    "message": "delivery_id=wh_80211 marked failed after 3 attempts",
+    "trace_id": "wh-80211"
+  },
+  {
+    "timestamp": "2026-03-03T18:34:20Z",
+    "level": "INFO",
+    "service": "status-prober",
+    "component": "partner-check",
+    "message": "partner=payroll-sync HTTPS probe 200 duration_ms=2380",
+    "trace_id": "probe-871a"
+  },
+  {
+    "timestamp": "2026-03-03T18:36:19Z",
+    "level": "WARN",
+    "service": "webhook-dispatcher",
+    "component": "delivery-client",
+    "message": "delivery_id=wh_80302 partner=payroll-sync upstream timeout after 2000ms",
+    "trace_id": "wh-80302"
+  },
+  {
+    "timestamp": "2026-03-03T18:39:04Z",
+    "level": "INFO",
+    "service": "kafka-broker",
+    "component": "network",
+    "message": "ISR expand event for topic webhook-events",
+    "trace_id": "kfk-882a"
+  },
+  {
+    "timestamp": "2026-03-03T18:42:27Z",
+    "level": "WARN",
+    "service": "webhook-dispatcher",
+    "component": "retry-scheduler",
+    "message": "delivery_id=wh_80419 duplicate suppression not triggered because previous attempt timed out",
+    "trace_id": "wh-80419"
+  },
+  {
+    "timestamp": "2026-03-03T18:46:38Z",
+    "level": "INFO",
+    "service": "incident-bot",
+    "component": "chatops",
+    "message": "Customer support reports delayed payroll webhook notifications",
+    "trace_id": "chat-01db"
+  },
+  {
+    "timestamp": "2026-03-03T18:53:52Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollback",
+    "message": "Rollback completed for webhook-dispatcher version 2026.03.03.1",
+    "trace_id": "deploy-w305"
+  },
+  {
+    "timestamp": "2026-03-03T18:58:47Z",
+    "level": "INFO",
+    "service": "webhook-dispatcher",
+    "component": "worker",
+    "message": "delivery_id=wh_80822 partner=payroll-sync status=success duration_ms=2417",
+    "trace_id": "wh-80822"
+  }
+]

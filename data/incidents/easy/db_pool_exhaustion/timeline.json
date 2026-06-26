@@ -1,0 +1,42 @@
+[
+  {
+    "timestamp": "2026-05-14T15:59:22Z",
+    "actor": "deploy-controller",
+    "event": "checkout-api version 2026.05.14.3 finished rolling out to production"
+  },
+  {
+    "timestamp": "2026-05-14T16:05:00Z",
+    "actor": "monitoring",
+    "event": "checkout-api p95 latency crossed 700ms alert threshold"
+  },
+  {
+    "timestamp": "2026-05-14T16:08:00Z",
+    "actor": "monitoring",
+    "event": "checkout-api error rate exceeded 15 percent for 3 minutes"
+  },
+  {
+    "timestamp": "2026-05-14T16:11:00Z",
+    "actor": "oncall-sre",
+    "event": "Initial hypothesis focused on a primary database slowdown because timeouts appeared in application logs"
+  },
+  {
+    "timestamp": "2026-05-14T16:16:00Z",
+    "actor": "oncall-sre",
+    "event": "Metrics review showed database host connections stable while application pool waiters spiked sharply after the deploy"
+  },
+  {
+    "timestamp": "2026-05-14T16:21:00Z",
+    "actor": "backend-engineer",
+    "event": "Recent config commit identified a reduced max pool size packaged in version 2026.05.14.3"
+  },
+  {
+    "timestamp": "2026-05-14T16:29:54Z",
+    "actor": "incident-commander",
+    "event": "Rollback to version 2026.05.14.2 approved and started"
+  },
+  {
+    "timestamp": "2026-05-14T16:33:00Z",
+    "actor": "monitoring",
+    "event": "Latency and error rate returned to baseline after rollback"
+  }
+]

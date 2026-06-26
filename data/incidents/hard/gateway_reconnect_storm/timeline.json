@@ -1,0 +1,47 @@
+[
+  {
+    "timestamp": "2026-05-03T16:48:00Z",
+    "actor": "platform-ops",
+    "event": "Shard rebalance started, relocating a subset of gateway sessions across node groups"
+  },
+  {
+    "timestamp": "2026-05-03T16:57:19Z",
+    "actor": "deploy-controller",
+    "event": "realtime-gateway version 2026.05.03.6 completed rollout"
+  },
+  {
+    "timestamp": "2026-05-03T17:06:00Z",
+    "actor": "monitoring",
+    "event": "Gateway disconnects and identify traffic rose sharply, causing widespread client reconnects"
+  },
+  {
+    "timestamp": "2026-05-03T17:12:00Z",
+    "actor": "oncall-engineer",
+    "event": "Early hypothesis focused on regional edge instability because disconnects were global and user-visible"
+  },
+  {
+    "timestamp": "2026-05-03T17:19:00Z",
+    "actor": "sre",
+    "event": "Redis and auth latency rose as secondary symptoms, creating a competing hypothesis of session-store saturation"
+  },
+  {
+    "timestamp": "2026-05-03T17:27:00Z",
+    "actor": "realtime-team",
+    "event": "Resume rejection telemetry showed failures concentrated on sessions touched during shard transfer windows"
+  },
+  {
+    "timestamp": "2026-05-03T17:35:00Z",
+    "actor": "incident-commander",
+    "event": "Team concluded reconnect amplification was primary and approved rollback of the gateway release"
+  },
+  {
+    "timestamp": "2026-05-03T17:41:10Z",
+    "actor": "deploy-controller",
+    "event": "Rollback to version 2026.05.03.5 completed"
+  },
+  {
+    "timestamp": "2026-05-03T17:49:00Z",
+    "actor": "monitoring",
+    "event": "Resume rejection ratio, identify rate, and downstream saturation all began returning to baseline"
+  }
+]

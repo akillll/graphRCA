@@ -1,0 +1,25 @@
+{
+  "id": "easy_redis_tls_misconfig_2026_02_11",
+  "title": "Session API failures after Redis client TLS toggle",
+  "difficulty": "easy",
+  "service": "session-api",
+  "severity": "sev-2",
+  "summary": "Session creation and validation requests failed after a production deployment. Application logs mention Redis handshake errors, but the RCA depends on proving the cache cluster itself stayed healthy and that the deployed build changed the client transport mode.",
+  "start_time": "2026-02-11T09:41:00Z",
+  "end_time": "2026-02-11T10:09:00Z",
+  "tags": [
+    "redis",
+    "sessions",
+    "tls",
+    "configuration",
+    "deployment-regression"
+  ],
+  "primary_hypotheses": [
+    "redis outage",
+    "network regression",
+    "client TLS misconfiguration"
+  ],
+  "relevant_runbooks": [
+    "redis_connectivity.md"
+  ]
+}

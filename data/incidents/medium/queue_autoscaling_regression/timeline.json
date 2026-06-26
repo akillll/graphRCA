@@ -1,0 +1,42 @@
+[
+  {
+    "timestamp": "2026-03-18T15:50:00Z",
+    "actor": "platform-ops",
+    "event": "Large tenant corp_azimuth was remapped to shard 7, increasing shard-local notification ingress"
+  },
+  {
+    "timestamp": "2026-03-18T16:21:52Z",
+    "actor": "deploy-controller",
+    "event": "notification-autoscaler version 2026.03.18.3 completed rollout"
+  },
+  {
+    "timestamp": "2026-03-18T16:42:00Z",
+    "actor": "monitoring",
+    "event": "Oldest message age alert fired for shard 7 while provider probes remained healthy"
+  },
+  {
+    "timestamp": "2026-03-18T16:50:00Z",
+    "actor": "oncall-engineer",
+    "event": "Initial investigation considered SES and APNS slowdown because workers were retrying sends"
+  },
+  {
+    "timestamp": "2026-03-18T17:00:00Z",
+    "actor": "sre",
+    "event": "Comparison of total queue depth with autoscaler observed depth revealed the autoscaler was undercounting backlog"
+  },
+  {
+    "timestamp": "2026-03-18T17:08:00Z",
+    "actor": "platform-engineer",
+    "event": "Recent autoscaler commit and the hot-shard tenant migration were identified as the interacting causes"
+  },
+  {
+    "timestamp": "2026-03-18T17:15:41Z",
+    "actor": "incident-commander",
+    "event": "Rollback of notification-autoscaler version 2026.03.18.3 started"
+  },
+  {
+    "timestamp": "2026-03-18T17:25:00Z",
+    "actor": "monitoring",
+    "event": "Worker replicas scaled up and shard 7 backlog began draining"
+  }
+]

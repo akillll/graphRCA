@@ -1,0 +1,42 @@
+[
+  {
+    "timestamp": "2026-02-27T08:05:00Z",
+    "actor": "platform-ops",
+    "event": "Node rotation in us-east-1c increased the share of auth-api pods scheduled in that zone"
+  },
+  {
+    "timestamp": "2026-02-27T08:17:24Z",
+    "actor": "deploy-controller",
+    "event": "auth-network-policy version 2026.02.27.1 completed rollout"
+  },
+  {
+    "timestamp": "2026-02-27T08:24:00Z",
+    "actor": "monitoring",
+    "event": "Token refresh error alerts fired, but synthetic identity probes remained healthy"
+  },
+  {
+    "timestamp": "2026-02-27T08:32:00Z",
+    "actor": "oncall-engineer",
+    "event": "Initial hypothesis focused on flaky identity-provider behavior because application logs showed timeouts and incomplete mTLS handshakes"
+  },
+  {
+    "timestamp": "2026-02-27T08:40:00Z",
+    "actor": "sre",
+    "event": "AZ-level metrics revealed errors concentrated in us-east-1c while dependency probes from other zones remained green"
+  },
+  {
+    "timestamp": "2026-02-27T08:46:00Z",
+    "actor": "platform-engineer",
+    "event": "CNI policy-drop logs and recent network policy commits pointed to blocked egress from auth pods in us-east-1c"
+  },
+  {
+    "timestamp": "2026-02-27T08:51:13Z",
+    "actor": "incident-commander",
+    "event": "Rollback of auth-network-policy version 2026.02.27.1 started"
+  },
+  {
+    "timestamp": "2026-02-27T08:58:00Z",
+    "actor": "monitoring",
+    "event": "Token refresh success returned to baseline after rollback"
+  }
+]

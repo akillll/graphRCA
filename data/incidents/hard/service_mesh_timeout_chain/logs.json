@@ -1,0 +1,130 @@
+[
+  {
+    "timestamp": "2026-03-07T19:02:13Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollout",
+    "message": "Production deployment completed for mesh-routing-policy version 2026.03.07.2",
+    "trace_id": "deploy-mesh201"
+  },
+  {
+    "timestamp": "2026-03-07T19:09:00Z",
+    "level": "INFO",
+    "service": "inventory-platform",
+    "component": "maintenance",
+    "message": "us-east-1b inventory node pool running with 2 pods drained for kernel patching",
+    "trace_id": "mnt-11b"
+  },
+  {
+    "timestamp": "2026-03-07T19:14:08Z",
+    "level": "WARN",
+    "service": "checkout-orchestrator",
+    "component": "pricing-client",
+    "message": "pricing request exceeded 400ms local budget",
+    "trace_id": "chk-50011"
+  },
+  {
+    "timestamp": "2026-03-07T19:14:19Z",
+    "level": "WARN",
+    "service": "mesh-sidecar",
+    "component": "envoy",
+    "message": "retrying upstream request cluster=inventory-api attempt=2 prior_timeout=300ms",
+    "trace_id": "mesh-7811"
+  },
+  {
+    "timestamp": "2026-03-07T19:15:26Z",
+    "level": "WARN",
+    "service": "pricing-api",
+    "component": "quote-builder",
+    "message": "waiting on inventory availability subrequest beyond expected budget",
+    "trace_id": "prc-4109"
+  },
+  {
+    "timestamp": "2026-03-07T19:16:04Z",
+    "level": "INFO",
+    "service": "payment-adapter",
+    "component": "gateway-probe",
+    "message": "payment provider authorization latency normal at 211ms",
+    "trace_id": "pay-probe-11"
+  },
+  {
+    "timestamp": "2026-03-07T19:17:12Z",
+    "level": "WARN",
+    "service": "inventory-api",
+    "component": "db",
+    "message": "stock reservation queue depth above threshold",
+    "trace_id": "inv-6011"
+  },
+  {
+    "timestamp": "2026-03-07T19:18:49Z",
+    "level": "ERROR",
+    "service": "checkout-orchestrator",
+    "component": "http",
+    "message": "POST /v1/checkout 504 3206ms",
+    "trace_id": "chk-50066"
+  },
+  {
+    "timestamp": "2026-03-07T19:21:18Z",
+    "level": "WARN",
+    "service": "mesh-sidecar",
+    "component": "envoy",
+    "message": "cluster=pricing-api cross-zone fallback selected due to endpoint scarcity",
+    "trace_id": "mesh-7823"
+  },
+  {
+    "timestamp": "2026-03-07T19:24:00Z",
+    "level": "INFO",
+    "service": "ops-bot",
+    "component": "chatops",
+    "message": "Checkout team suspects payment provider instability because end-user failures happen during checkout submission",
+    "trace_id": "chat-pay-11"
+  },
+  {
+    "timestamp": "2026-03-07T19:27:31Z",
+    "level": "WARN",
+    "service": "mesh-sidecar",
+    "component": "envoy",
+    "message": "upstream_rq_retry_overflow cluster=inventory-api",
+    "trace_id": "mesh-7844"
+  },
+  {
+    "timestamp": "2026-03-07T19:31:50Z",
+    "level": "WARN",
+    "service": "payment-adapter",
+    "component": "idempotency-cache",
+    "message": "authorization requests arriving after checkout deadline cancellation",
+    "trace_id": "pay-4418"
+  },
+  {
+    "timestamp": "2026-03-07T19:36:14Z",
+    "level": "INFO",
+    "service": "pricing-api",
+    "component": "cache",
+    "message": "hot quote cache hit ratio remains 93 percent",
+    "trace_id": "prc-cache-1"
+  },
+  {
+    "timestamp": "2026-03-07T19:45:06Z",
+    "level": "WARN",
+    "service": "inventory-api",
+    "component": "worker",
+    "message": "reservation worker saturated by duplicated reservation attempts",
+    "trace_id": "inv-6051"
+  },
+  {
+    "timestamp": "2026-03-07T19:58:02Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollback",
+    "message": "Rollback completed for mesh-routing-policy version 2026.03.07.1",
+    "trace_id": "deploy-mesh206"
+  },
+  {
+    "timestamp": "2026-03-07T20:06:18Z",
+    "level": "INFO",
+    "service": "checkout-orchestrator",
+    "component": "http",
+    "message": "POST /v1/checkout 200 684ms",
+    "trace_id": "chk-50881"
+  }
+]

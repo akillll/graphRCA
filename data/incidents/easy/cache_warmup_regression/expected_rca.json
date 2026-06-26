@@ -1,0 +1,43 @@
+{
+  "root_cause": "Catalog API version 2026.04.21.5 introduced a cache policy regression that shortened product TTLs and skipped async warmup for keys below the new threshold. That combination caused a broad cache miss storm, which drove excess read traffic to PostgreSQL and elevated latency. The root cause is not obvious from logs alone because the visible errors are mostly downstream read timeouts and slow queries rather than an explicit cache failure.",
+  "confidence": "high",
+  "evidence_sources": [
+    {
+      "source": "logs",
+      "details": [
+        "Repeated Redis miss warnings and warmup skipped messages began shortly after the deployment",
+        "Database deadline exceeded errors followed the cache miss burst rather than preceding it"
+      ]
+    },
+    {
+      "source": "metrics",
+      "details": [
+        "redis_cache_a.hit_rate_percent fell from 95 percent to 38 percent while cache evictions stayed flat, arguing against a Redis capacity issue",
+        "postgres_read_replica.cpu_percent rose in the same window, consistent with cache misses shifting load to the database"
+      ]
+    },
+    {
+      "source": "commits",
+      "details": [
+        "Commits 55b191e and d53c9e4 changed TTL and warmup logic in the deployed build"
+      ]
+    },
+    {
+      "source": "deployments",
+      "details": [
+        "Impact began within minutes of deployment catalog-prod-6107 and resolved after rollback catalog-prod-6108"
+      ]
+    }
+  ],
+  "recommended_actions": [
+    "Revert the aggressive TTL reduction and require load testing before cache policy changes reach production",
+    "Add an alert for sharp cache hit-rate drops even when Redis node health remains green",
+    "Guard warmup-skipping logic with a feature flag so policy experiments can be disabled without rollback"
+  ],
+  "expected_investigation_path": [
+    "inspect request latency and error symptoms in catalog-api logs",
+    "compare Redis hit-rate and PostgreSQL read-replica utilization to distinguish cache failure from database-only slowdown",
+    "review recent cache-related commits included in version 2026.04.21.5",
+    "confirm causality from deployment timing and rollback recovery"
+  ]
+}

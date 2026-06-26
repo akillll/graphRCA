@@ -1,0 +1,43 @@
+{
+  "root_cause": "Session API version 2026.02.11.7 enabled TLS on the Redis client while the production Redis cluster still accepted plaintext connections on port 6379. The client therefore failed its startup handshake and every session write began failing. Logs alone resemble a generic Redis connectivity issue, but cluster health metrics and the Redis transport commit isolate the cause to an application-side TLS misconfiguration.",
+  "confidence": "high",
+  "evidence_sources": [
+    {
+      "source": "logs",
+      "details": [
+        "Session API logs show tls handshake failure and EOF during Redis startup handshake",
+        "Redis node logs continue showing accepted client connections and steady replication rather than a node outage"
+      ]
+    },
+    {
+      "source": "metrics",
+      "details": [
+        "session_api.redis_write_success_percent collapses while redis_cache_b.server_cpu_percent and connected_clients remain stable",
+        "TCP resets increase on port 6379 immediately after deployment, consistent with protocol mismatch"
+      ]
+    },
+    {
+      "source": "commits",
+      "details": [
+        "Commit 3efc8b7 enabled secure Redis transport in the session store client configuration"
+      ]
+    },
+    {
+      "source": "deployments",
+      "details": [
+        "Impact begins after session-prod-4401 and clears after rollback session-prod-4402"
+      ]
+    }
+  ],
+  "recommended_actions": [
+    "Gate Redis TLS enablement behind an environment-specific flag and verify server-side support before rollout",
+    "Add canary validation that performs an actual Redis read and write using the deployed client configuration",
+    "Document cache transport assumptions in the Redis connectivity runbook"
+  ],
+  "expected_investigation_path": [
+    "inspect session-api logs for failing dependency operations",
+    "compare application failure metrics with Redis server health to determine whether the cache cluster is actually unhealthy",
+    "review recent commits touching Redis client transport settings",
+    "confirm the conclusion against deployment onset and rollback recovery"
+  ]
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "commit_id": "4b0ca93",
+    "author": "jramirez",
+    "timestamp": "2026-03-18T15:58:11Z",
+    "message": "Aggregate queue depth per shard before autoscaler evaluation",
+    "files_changed": [
+      "src/autoscaler/queue_sampler.py",
+      "config/autoscaler/notification.yaml"
+    ]
+  },
+  {
+    "commit_id": "1a7b210",
+    "author": "mng",
+    "timestamp": "2026-03-18T15:59:40Z",
+    "message": "Reduce autoscaler oscillation by averaging visible depth across shards",
+    "files_changed": [
+      "src/autoscaler/decision_engine.py"
+    ]
+  },
+  {
+    "commit_id": "912d4f2",
+    "author": "tenant-bot",
+    "timestamp": "2026-03-18T15:12:00Z",
+    "message": "Move corp_azimuth notification stream to shard 7",
+    "files_changed": [
+      "ops/shards/tenant_mapping.yaml"
+    ]
+  }
+]

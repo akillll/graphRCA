@@ -1,0 +1,40 @@
+{
+  "id": "hard_gateway_reconnect_storm_2026_05_03",
+  "title": "Gateway reconnect storm triggered by session resume regression and control-plane churn",
+  "difficulty": "hard",
+  "service": "realtime-gateway",
+  "severity": "sev-1",
+  "summary": "A large share of websocket clients were disconnected and repeatedly reconnected, driving a cascading surge across gateway, session-store, and auth services. Initial symptoms resembled an edge network outage or Redis incident, but the actual cause requires combining rollout timing, resume-token invalidation behavior, reconnect amplification metrics, and a control-plane shard rebalance that increased blast radius.",
+  "start_time": "2026-05-03T17:06:00Z",
+  "end_time": "2026-05-03T18:19:00Z",
+  "tags": [
+    "reconnect-storm",
+    "websockets",
+    "session-resume",
+    "redis",
+    "control-plane",
+    "cascading-failure"
+  ],
+  "primary_hypotheses": [
+    "edge network instability",
+    "redis session-store outage",
+    "auth token validation bottleneck",
+    "gateway resume regression with reconnect amplification"
+  ],
+  "operational_context": [
+    "A shard-balancer maintenance action started at 16:48Z and relocated 11 percent of gateway shards to even node pressure.",
+    "The realtime-gateway deployment at 16:57Z changed websocket resume handling to reject stale generation numbers more aggressively."
+  ],
+  "affected_services": [
+    "realtime-gateway",
+    "session-store",
+    "auth-api",
+    "edge-proxy",
+    "shard-balancer"
+  ],
+  "relevant_runbooks": [
+    "reconnect_storm.md",
+    "session_store_saturation.md",
+    "distributed_timeout_chain.md"
+  ]
+}

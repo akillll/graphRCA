@@ -1,0 +1,50 @@
+{
+  "root_cause": "Entitlements API version 2026.04.09.2 expanded replica-preferring reads for cache misses at the same time that the nightly billing reconciliation batch drove replica lag above 90 seconds. Newly purchased subscriptions were written successfully, but entitlement checks read stale state from the lagging replica and incorrectly denied premium access until rollback reduced replica read share.",
+  "confidence": "high",
+  "evidence_sources": [
+    {
+      "source": "logs",
+      "details": [
+        "Entitlement reads show subscription not found and stale-version warnings after successful checkout purchases",
+        "Cache refreshes are skipped because the read source returned empty rows, which points to stale reads rather than write failure"
+      ]
+    },
+    {
+      "source": "metrics",
+      "details": [
+        "checkout_service.purchase_success_percent remains normal while entitlements 403s spike",
+        "billing_postgres.replica_lag_seconds rises above 100 seconds after the batch begins, and entitlements_api.replica_read_share_percent doubles after the deploy"
+      ]
+    },
+    {
+      "source": "commits",
+      "details": [
+        "Commit d8e0f14 changed read routing to prefer replicas on cache misses",
+        "Commit 729d5be scheduled the reconciliation workload that created the lagging context"
+      ]
+    },
+    {
+      "source": "deployments",
+      "details": [
+        "Both the reconciliation job start and the entitlements rollout precede impact, and rollback reduces the symptom quickly"
+      ]
+    },
+    {
+      "source": "operational_context",
+      "details": [
+        "The incident only affected recently changed subscription state, which matches a stale-read consistency problem rather than a broad outage"
+      ]
+    }
+  ],
+  "recommended_actions": [
+    "Route entitlement reads for recently updated accounts to primary or require bounded replica lag before using replicas",
+    "Pause or throttle reconciliation writes when replica lag crosses a safety threshold",
+    "Add alerts that combine replica lag with stale-read symptoms instead of relying on generic database health"
+  ],
+  "expected_investigation_path": [
+    "Verify whether purchases are failing or only post-purchase entitlement checks are wrong",
+    "Compare cache misses, replica lag, primary load, and read-share metrics",
+    "Review recent entitlements read-routing changes and concurrent batch-job activity",
+    "Correlate impact timing with the deploy plus reconciliation window and confirm recovery after rollback"
+  ]
+}

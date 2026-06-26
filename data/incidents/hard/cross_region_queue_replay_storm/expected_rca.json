@@ -1,0 +1,55 @@
+{
+  "root_cause": "A consumer failover recovery release restored mirrored checkpoints before local epoch advancement and deferred checkpoint writes whenever the mirrored generation looked newer. During a real cross-region failover, that logic caused portions of the ingestion consumer group to replay already processed ranges instead of converging on the latest committed offsets. Duplicate processing then saturated the dedup cache, reduced suppression effectiveness, and cascaded backlog into notifications and analytics. Broker instability and producer duplication were false leads because broker health stabilized early and producer duplicate metrics stayed flat.",
+  "confidence": "high",
+  "evidence_sources": [
+    {
+      "source": "logs",
+      "details": [
+        "Checkpoint restoration and deferred write warnings precede the largest duplicate and backlog signals",
+        "Analytics and notification warnings appear later as downstream consequences of replayed events"
+      ]
+    },
+    {
+      "source": "metrics",
+      "details": [
+        "consumer_group.mirror_checkpoint_epoch_divergence rises sharply while producer duplicate percent remains near baseline",
+        "dedup cache evictions and duplicate candidate rate increase before downstream queue depth peaks"
+      ]
+    },
+    {
+      "source": "commits",
+      "details": [
+        "Commits 8a71c22 and 0d24f7c both modified failover checkpoint semantics in the deployed version"
+      ]
+    },
+    {
+      "source": "deployments",
+      "details": [
+        "The consumer rollout precedes the regional failover, and the incident only manifests once the failover exercises the new logic; rollback then restores convergence"
+      ]
+    },
+    {
+      "source": "operational_context",
+      "details": [
+        "The secondary-region traffic shift was the trigger condition that made the latent checkpoint bug active"
+      ]
+    },
+    {
+      "source": "multiple_affected_services",
+      "details": [
+        "event-ingestion-consumer, dedup-cache, kafka consumer groups, notification-worker, and analytics-writer degrade in sequence"
+      ]
+    }
+  ],
+  "recommended_actions": [
+    "Simplify failover checkpoint semantics so local epoch advancement happens before mirrored restoration can trigger replay",
+    "Add failover drills that verify offset monotonicity and downstream duplicate suppression under real traffic shifts",
+    "Alert on checkpoint epoch divergence separately from broker lag to catch replay storms earlier"
+  ],
+  "expected_investigation_path": [
+    "Check whether duplicates originate at producers, brokers, or consumers instead of assuming one layer",
+    "Compare duplicate candidate rate with producer duplicate metrics and failover timing",
+    "Inspect checkpoint and epoch-related logs plus recent consumer failover commits",
+    "Trace how replay pressure saturates dedup and then propagates into downstream queues"
+  ]
+}

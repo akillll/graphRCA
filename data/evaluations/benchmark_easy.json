@@ -1,0 +1,85 @@
+{
+  "benchmark_id": "benchmark_easy_v1",
+  "difficulty": "easy",
+  "description": "Initial easy benchmark set for single-service production-inspired incidents that still require multi-source evidence correlation across logs, metrics, commits, and deployments.",
+  "incidents": [
+    {
+      "incident_id": "easy_db_pool_exhaustion_2026_05_14",
+      "path": "data/incidents/easy/db_pool_exhaustion",
+      "service": "checkout-api",
+      "severity": "sev-2",
+      "expected_tools": [
+        "search_logs",
+        "get_metrics",
+        "get_recent_commits",
+        "get_deployments"
+      ],
+      "required_evidence_sources": [
+        "logs",
+        "metrics",
+        "commits",
+        "deployments"
+      ]
+    },
+    {
+      "incident_id": "easy_cache_warmup_regression_2026_04_21",
+      "path": "data/incidents/easy/cache_warmup_regression",
+      "service": "catalog-api",
+      "severity": "sev-2",
+      "expected_tools": [
+        "search_logs",
+        "get_metrics",
+        "get_recent_commits",
+        "get_deployments"
+      ],
+      "required_evidence_sources": [
+        "logs",
+        "metrics",
+        "commits",
+        "deployments"
+      ]
+    },
+    {
+      "incident_id": "easy_webhook_retry_amplification_2026_03_03",
+      "path": "data/incidents/easy/webhook_retry_amplification",
+      "service": "webhook-dispatcher",
+      "severity": "sev-2",
+      "expected_tools": [
+        "search_logs",
+        "get_metrics",
+        "get_recent_commits",
+        "get_deployments"
+      ],
+      "required_evidence_sources": [
+        "logs",
+        "metrics",
+        "commits",
+        "deployments"
+      ]
+    },
+    {
+      "incident_id": "easy_redis_tls_misconfig_2026_02_11",
+      "path": "data/incidents/easy/redis_tls_misconfig",
+      "service": "session-api",
+      "severity": "sev-2",
+      "expected_tools": [
+        "search_logs",
+        "get_metrics",
+        "get_recent_commits",
+        "get_deployments"
+      ],
+      "required_evidence_sources": [
+        "logs",
+        "metrics",
+        "commits",
+        "deployments"
+      ]
+    }
+  ],
+  "scoring_dimensions": [
+    "root_cause_accuracy",
+    "evidence_coverage",
+    "confidence_explainability",
+    "timeline_reconstruction"
+  ]
+}

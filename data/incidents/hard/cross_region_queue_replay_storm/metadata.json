@@ -1,0 +1,40 @@
+{
+  "id": "hard_cross_region_queue_replay_storm_2026_01_18",
+  "title": "Cross-region queue replay storm after consumer offset failover regression",
+  "difficulty": "hard",
+  "service": "event-ingestion-pipeline",
+  "severity": "sev-1",
+  "summary": "A regional failover event led to duplicated event processing, runaway backpressure, and delayed customer-visible workflows across analytics and notifications. The incident initially looked like a broker outage or a producer bug, but the RCA requires correlating failover ordering, consumer offset replay semantics, dedup cache saturation, and lag propagation across multiple downstream services.",
+  "start_time": "2026-01-18T06:22:00Z",
+  "end_time": "2026-01-18T07:46:00Z",
+  "tags": [
+    "queue-replay",
+    "cross-region-failover",
+    "offsets",
+    "dedup-cache",
+    "backpressure",
+    "multi-service"
+  ],
+  "primary_hypotheses": [
+    "broker cluster instability",
+    "producer duplicate publish bug",
+    "consumer offset replay after failover",
+    "deduplication layer exhaustion"
+  ],
+  "operational_context": [
+    "A traffic shift to the secondary region started at 06:11Z after network instability alerts in the primary region.",
+    "The ingestion consumer deployment at 05:58Z modified checkpoint persistence to speed failover recovery."
+  ],
+  "affected_services": [
+    "event-ingestion-consumer",
+    "kafka-broker",
+    "dedup-cache",
+    "notification-worker",
+    "analytics-writer"
+  ],
+  "relevant_runbooks": [
+    "queue_replay.md",
+    "cross_region_failover.md",
+    "backpressure_cascade.md"
+  ]
+}

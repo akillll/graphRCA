@@ -1,0 +1,146 @@
+[
+  {
+    "timestamp": "2026-05-22T11:02:11Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollout",
+    "message": "Production deployment completed for media-worker version 2026.05.22.4",
+    "trace_id": "deploy-mw221"
+  },
+  {
+    "timestamp": "2026-05-22T11:07:33Z",
+    "level": "INFO",
+    "service": "media-worker",
+    "component": "job-runner",
+    "message": "job_id=img_84210 variants=3 completed in 422ms",
+    "trace_id": "mw-84210"
+  },
+  {
+    "timestamp": "2026-05-22T11:18:14Z",
+    "level": "WARN",
+    "service": "media-worker",
+    "component": "queue-consumer",
+    "message": "job_id=img_84804 processing time exceeded soft threshold at 2800ms",
+    "trace_id": "mw-84804"
+  },
+  {
+    "timestamp": "2026-05-22T11:19:52Z",
+    "level": "INFO",
+    "service": "s3-gateway",
+    "component": "storage",
+    "message": "PUT object avatars/2026/05/22/df1a succeeded in 91ms",
+    "trace_id": "s3-112a"
+  },
+  {
+    "timestamp": "2026-05-22T11:23:48Z",
+    "level": "WARN",
+    "service": "media-worker",
+    "component": "image-decoder",
+    "message": "job_id=img_85027 EXIF parse fallback used for malformed orientation tag",
+    "trace_id": "mw-85027"
+  },
+  {
+    "timestamp": "2026-05-22T11:27:01Z",
+    "level": "WARN",
+    "service": "media-worker",
+    "component": "runtime",
+    "message": "heap usage above 85 percent of container limit",
+    "trace_id": "mw-heap-41"
+  },
+  {
+    "timestamp": "2026-05-22T11:29:17Z",
+    "level": "ERROR",
+    "service": "media-worker",
+    "component": "job-runner",
+    "message": "job_id=img_85218 upload notification publish failed: context deadline exceeded",
+    "trace_id": "mw-85218"
+  },
+  {
+    "timestamp": "2026-05-22T11:31:44Z",
+    "level": "INFO",
+    "service": "autoscaler",
+    "component": "hpa",
+    "message": "Scaled media-worker from 24 to 30 replicas on queue depth signal",
+    "trace_id": "hpa-77b1"
+  },
+  {
+    "timestamp": "2026-05-22T11:35:09Z",
+    "level": "WARN",
+    "service": "media-worker",
+    "component": "runtime",
+    "message": "GC pause 146ms; retained heap 698MiB",
+    "trace_id": "mw-gc-580"
+  },
+  {
+    "timestamp": "2026-05-22T11:37:22Z",
+    "level": "INFO",
+    "service": "kubelet",
+    "component": "node",
+    "message": "Container media-worker in pod media-worker-7d8cf9b7b9-rx5xk terminated with reason OOMKilled",
+    "trace_id": "k8s-oom-2001"
+  },
+  {
+    "timestamp": "2026-05-22T11:38:40Z",
+    "level": "WARN",
+    "service": "media-worker",
+    "component": "queue-consumer",
+    "message": "job_id=img_85631 requeued after worker heartbeat expired",
+    "trace_id": "mw-85631"
+  },
+  {
+    "timestamp": "2026-05-22T11:42:57Z",
+    "level": "INFO",
+    "service": "cdn-purger",
+    "component": "scheduler",
+    "message": "Purged 1201 stale avatar paths",
+    "trace_id": "cdn-44de"
+  },
+  {
+    "timestamp": "2026-05-22T11:47:11Z",
+    "level": "WARN",
+    "service": "media-worker",
+    "component": "runtime",
+    "message": "heap usage above 90 percent of container limit",
+    "trace_id": "mw-heap-59"
+  },
+  {
+    "timestamp": "2026-05-22T11:51:26Z",
+    "level": "INFO",
+    "service": "support-bot",
+    "component": "chatops",
+    "message": "Users report delayed profile photo updates, no reports of failed uploads",
+    "trace_id": "chat-0fa2"
+  },
+  {
+    "timestamp": "2026-05-22T11:54:08Z",
+    "level": "ERROR",
+    "service": "media-worker",
+    "component": "job-runner",
+    "message": "job_id=img_86141 thumbnail generation aborted: signal killed",
+    "trace_id": "mw-86141"
+  },
+  {
+    "timestamp": "2026-05-22T12:01:18Z",
+    "level": "INFO",
+    "service": "s3-gateway",
+    "component": "storage",
+    "message": "GET object uploads/raw/2026/05/22/ab9f succeeded in 84ms",
+    "trace_id": "s3-11b3"
+  },
+  {
+    "timestamp": "2026-05-22T12:09:32Z",
+    "level": "INFO",
+    "service": "deploy-controller",
+    "component": "rollback",
+    "message": "Rollback completed for media-worker version 2026.05.22.3",
+    "trace_id": "deploy-mw226"
+  },
+  {
+    "timestamp": "2026-05-22T12:14:44Z",
+    "level": "INFO",
+    "service": "media-worker",
+    "component": "job-runner",
+    "message": "job_id=img_87024 variants=3 completed in 510ms",
+    "trace_id": "mw-87024"
+  }
+]

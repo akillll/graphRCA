@@ -1,0 +1,50 @@
+{
+  "root_cause": "Auth failures were caused by a network policy regression in version 2026.02.27.1 that blocked egress from auth-api pods in us-east-1c to the token introspection service on port 8443. A concurrent node rotation placed more auth pods into that zone, amplifying user-visible impact. The dependency itself remained healthy, so logs alone were misleadingly similar to a downstream timeout incident.",
+  "confidence": "high",
+  "evidence_sources": [
+    {
+      "source": "logs",
+      "details": [
+        "Auth API logs show timeout and incomplete mTLS handshake symptoms, but probes from other zones succeed",
+        "CNI agent logs record dropped egress packets for the auth namespace toward the introspection service in us-east-1c"
+      ]
+    },
+    {
+      "source": "metrics",
+      "details": [
+        "auth_api.error_rate_us_east_1c_percent is far higher than fleet-wide error rate, proving zone concentration",
+        "identity_probe.success_rate_percent stays at 100 percent, eliminating a broad identity-provider outage"
+      ]
+    },
+    {
+      "source": "commits",
+      "details": [
+        "Commit b14c6d2 tightened auth namespace egress rules",
+        "Commit d8724a0 scheduled the us-east-1c node rotation that increased affected pod placement"
+      ]
+    },
+    {
+      "source": "deployments",
+      "details": [
+        "Node rotation sets the context, policy rollout precedes impact, and rollback immediately resolves failures"
+      ]
+    },
+    {
+      "source": "operational_context",
+      "details": [
+        "The issue was intermittent at the user level because only requests landing on pods in the affected zone failed"
+      ]
+    }
+  ],
+  "recommended_actions": [
+    "Require zone-scoped synthetic checks before promoting auth network policy changes",
+    "Validate egress policy targets against actual service identities and ports in every node pool",
+    "Alert on strong AZ skew in auth failures so partial-zone incidents are detected faster"
+  ],
+  "expected_investigation_path": [
+    "Inspect auth timeout symptoms and determine whether the dependency is broadly unhealthy",
+    "Break metrics down by availability zone and compare them with synthetic dependency probes",
+    "Review recent network policy and infrastructure changes affecting auth pod placement",
+    "Confirm the RCA against policy-drop logs and rollback recovery timing"
+  ]
+}

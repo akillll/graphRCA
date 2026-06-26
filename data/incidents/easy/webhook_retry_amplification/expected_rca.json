@@ -1,0 +1,43 @@
+{
+  "root_cause": "Webhook-dispatcher version 2026.03.03.2 reduced the outbound request timeout to 2 seconds, which was below the normal 2.3 to 2.4 second latency of the payroll-sync partner. Requests that previously succeeded began timing out locally, causing retries, duplicate work, and a rapidly growing delivery backlog.",
+  "confidence": "high",
+  "evidence_sources": [
+    {
+      "source": "logs",
+      "details": [
+        "Outbound timeout warnings all fail at roughly 2000ms and immediately requeue deliveries",
+        "After rollback, payroll-sync deliveries succeed with durations around 2417ms"
+      ]
+    },
+    {
+      "source": "metrics",
+      "details": [
+        "partner_payroll_sync.probe_latency_p95_ms remains stable near 2.4s instead of showing a dependency outage",
+        "retry_rate_percent and queue_depth spike immediately after deploy, indicating local retry amplification rather than upstream unavailability"
+      ]
+    },
+    {
+      "source": "commits",
+      "details": [
+        "Commit 11c0d9a explicitly changed outbound webhook timeout behavior in the deployed version"
+      ]
+    },
+    {
+      "source": "deployments",
+      "details": [
+        "The incident starts minutes after webhook-prod-3001 and resolves after rollback webhook-prod-3002"
+      ]
+    }
+  ],
+  "recommended_actions": [
+    "Restore a timeout higher than normal partner latency and document per-partner timeout expectations",
+    "Alert when local client timeout settings drop below observed dependency latency percentiles",
+    "Add retry amplification guards so timeouts do not immediately create backlog explosions"
+  ],
+  "expected_investigation_path": [
+    "inspect webhook-dispatcher timeout and retry logs",
+    "compare queue depth, retry rate, and independent partner probe latency to distinguish partner outage from local timeout misconfiguration",
+    "review recent commits touching outbound HTTP client settings",
+    "validate the theory against deployment timing and successful post-rollback deliveries"
+  ]
+}

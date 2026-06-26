@@ -1,0 +1,42 @@
+[
+  {
+    "timestamp": "2026-04-14T12:56:41Z",
+    "actor": "deploy-controller",
+    "event": "feature-flag-control-plane version 2026.04.14.4 completed rollout"
+  },
+  {
+    "timestamp": "2026-04-14T13:00:00Z",
+    "actor": "growth-ops",
+    "event": "Spring launch increased public traffic and feature-flag evaluations across several product surfaces"
+  },
+  {
+    "timestamp": "2026-04-14T13:08:00Z",
+    "actor": "monitoring",
+    "event": "Resolve latency and cache miss alerts fired in the flag control plane"
+  },
+  {
+    "timestamp": "2026-04-14T13:16:00Z",
+    "actor": "oncall-engineer",
+    "event": "The first investigation loop focused on PostgreSQL because database CPU and lock waits rose sharply"
+  },
+  {
+    "timestamp": "2026-04-14T13:24:00Z",
+    "actor": "sre",
+    "event": "CDN probes stayed healthy while cache hit rate collapsed, shifting focus from config propagation to control-plane caching"
+  },
+  {
+    "timestamp": "2026-04-14T13:36:00Z",
+    "actor": "feature-team",
+    "event": "Recent commits and invalidation metrics linked namespace wildcard invalidation to mass cache refill and retry amplification"
+  },
+  {
+    "timestamp": "2026-04-14T13:54:14Z",
+    "actor": "incident-commander",
+    "event": "Rollback to version 2026.04.14.3 started"
+  },
+  {
+    "timestamp": "2026-04-14T14:04:00Z",
+    "actor": "monitoring",
+    "event": "Cache hit rate, database load, and stale-config serving began recovering after rollback"
+  }
+]

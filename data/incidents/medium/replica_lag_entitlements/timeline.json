@@ -1,0 +1,42 @@
+[
+  {
+    "timestamp": "2026-04-09T01:55:00Z",
+    "actor": "cron",
+    "event": "Nightly billing reconciliation batch started and increased sustained write pressure on the billing primary"
+  },
+  {
+    "timestamp": "2026-04-09T02:03:28Z",
+    "actor": "deploy-controller",
+    "event": "entitlements-api version 2026.04.09.2 completed rollout"
+  },
+  {
+    "timestamp": "2026-04-09T02:11:00Z",
+    "actor": "monitoring",
+    "event": "403 rate and entitlement cache miss alerts fired for premium feature checks"
+  },
+  {
+    "timestamp": "2026-04-09T02:18:00Z",
+    "actor": "oncall-engineer",
+    "event": "Initial investigation focused on purchase processing, but checkout success metrics remained normal"
+  },
+  {
+    "timestamp": "2026-04-09T02:24:00Z",
+    "actor": "sre",
+    "event": "Replica lag and read-share metrics showed a clear rise after the entitlements deploy while reconciliation was running"
+  },
+  {
+    "timestamp": "2026-04-09T02:31:00Z",
+    "actor": "backend-engineer",
+    "event": "Commit review identified new replica-preferring read routing for cache misses in the active release"
+  },
+  {
+    "timestamp": "2026-04-09T02:39:12Z",
+    "actor": "incident-commander",
+    "event": "Rollback to version 2026.04.09.1 started"
+  },
+  {
+    "timestamp": "2026-04-09T02:47:00Z",
+    "actor": "monitoring",
+    "event": "Access denials and stale-read indicators recovered as replica read share dropped"
+  }
+]

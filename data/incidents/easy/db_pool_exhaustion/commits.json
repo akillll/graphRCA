@@ -1,0 +1,30 @@
+[
+  {
+    "commit_id": "7ac4d12",
+    "author": "npatel",
+    "timestamp": "2026-05-14T15:42:11Z",
+    "message": "Tune checkout worker concurrency for lower pod memory footprint",
+    "files_changed": [
+      "deploy/checkout-api/deployment.yaml"
+    ]
+  },
+  {
+    "commit_id": "91fb2c8",
+    "author": "lchen",
+    "timestamp": "2026-05-14T15:44:39Z",
+    "message": "Normalize checkout DB pool settings across environments",
+    "files_changed": [
+      "config/checkout-api/application.yml",
+      "config/shared/database.yml"
+    ]
+  },
+  {
+    "commit_id": "d143f6a",
+    "author": "srodriguez",
+    "timestamp": "2026-05-14T15:48:54Z",
+    "message": "Add connection borrow timing to checkout metrics",
+    "files_changed": [
+      "src/db/pool_metrics.go"
+    ]
+  }
+]

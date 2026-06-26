@@ -1,0 +1,32 @@
+[
+  {
+    "deployment_id": "tenant-move-7001",
+    "timestamp": "2026-03-18T15:50:00Z",
+    "service": "tenant-migrator",
+    "environment": "production",
+    "version": "corp-azimuth-to-shard-7",
+    "strategy": "config-change",
+    "status": "completed",
+    "initiated_by": "platform-ops"
+  },
+  {
+    "deployment_id": "notif-auto-3101",
+    "timestamp": "2026-03-18T16:21:52Z",
+    "service": "notification-autoscaler",
+    "environment": "production",
+    "version": "2026.03.18.3",
+    "strategy": "rolling",
+    "status": "completed",
+    "initiated_by": "argo-rollouts"
+  },
+  {
+    "deployment_id": "notif-auto-3102",
+    "timestamp": "2026-03-18T17:15:41Z",
+    "service": "notification-autoscaler",
+    "environment": "production",
+    "version": "2026.03.18.2",
+    "strategy": "rollback",
+    "status": "completed",
+    "initiated_by": "incident-commander"
+  }
+]
