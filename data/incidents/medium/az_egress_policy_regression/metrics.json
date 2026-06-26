@@ -7,6 +7,7 @@
   "series": [
     {
       "metric": "auth_api.error_rate_percent",
+      "service": "auth-api",
       "unit": "percent",
       "points": [
         ["2026-02-27T08:00:00Z", 0.4],
@@ -28,6 +29,7 @@
     },
     {
       "metric": "auth_api.error_rate_us_east_1c_percent",
+      "service": "auth-api",
       "unit": "percent",
       "points": [
         ["2026-02-27T08:00:00Z", 0.5],
@@ -49,6 +51,7 @@
     },
     {
       "metric": "identity_probe.success_rate_percent",
+      "service": "identity-probe",
       "unit": "percent",
       "points": [
         ["2026-02-27T08:00:00Z", 100],
@@ -70,6 +73,7 @@
     },
     {
       "metric": "cni_agent.egress_drops_auth_namespace_per_min",
+      "service": "cni-agent",
       "unit": "packets",
       "points": [
         ["2026-02-27T08:00:00Z", 0],
@@ -91,6 +95,7 @@
     },
     {
       "metric": "auth_api.pods_in_us_east_1c_percent",
+      "service": "auth-api",
       "unit": "percent",
       "points": [
         ["2026-02-27T08:00:00Z", 23],
@@ -112,6 +117,7 @@
     },
     {
       "metric": "auth_api.node_cpu_p95_percent",
+      "service": "auth-api",
       "unit": "percent",
       "points": [
         ["2026-02-27T08:00:00Z", 44],

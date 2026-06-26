@@ -7,6 +7,7 @@
   "series": [
     {
       "metric": "event_ingestion_consumer.duplicate_candidate_percent",
+      "service": "event-ingestion-consumer",
       "unit": "percent",
       "points": [
         ["2026-01-18T05:55:00Z", 0.9],
@@ -37,6 +38,7 @@
     },
     {
       "metric": "dedup_cache.evictions_per_sec",
+      "service": "dedup-cache",
       "unit": "ops",
       "points": [
         ["2026-01-18T05:55:00Z", 3],
@@ -67,6 +69,7 @@
     },
     {
       "metric": "notification_worker.queue_depth",
+      "service": "notification-worker",
       "unit": "jobs",
       "points": [
         ["2026-01-18T05:55:00Z", 82],
@@ -97,6 +100,7 @@
     },
     {
       "metric": "kafka_broker.producer_duplicate_percent",
+      "service": "kafka-broker",
       "unit": "percent",
       "points": [
         ["2026-01-18T05:55:00Z", 0.4],
@@ -127,6 +131,7 @@
     },
     {
       "metric": "consumer_group.mirror_checkpoint_epoch_divergence",
+      "service": "event-ingestion-consumer",
       "unit": "epochs",
       "points": [
         ["2026-01-18T05:55:00Z", 0],

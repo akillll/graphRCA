@@ -7,7 +7,11 @@
     "version": "2026.02.11.7",
     "strategy": "rolling",
     "status": "completed",
-    "initiated_by": "argo-rollouts"
+    "initiated_by": "argo-rollouts",
+    "commit_ids": [
+      "3efc8b7",
+      "7b80dd3"
+    ]
   },
   {
     "deployment_id": "session-prod-4402",
@@ -17,6 +21,7 @@
     "version": "2026.02.11.6",
     "strategy": "rollback",
     "status": "completed",
-    "initiated_by": "session-oncall"
+    "initiated_by": "session-oncall",
+    "commit_ids": []
   }
 ]

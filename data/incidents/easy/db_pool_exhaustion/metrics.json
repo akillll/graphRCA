@@ -7,6 +7,7 @@
   "series": [
     {
       "metric": "checkout_api.request_rate_rps",
+      "service": "checkout-api",
       "unit": "rps",
       "points": [
         ["2026-05-14T15:55:00Z", 182],
@@ -22,6 +23,7 @@
     },
     {
       "metric": "checkout_api.error_rate_percent",
+      "service": "checkout-api",
       "unit": "percent",
       "points": [
         ["2026-05-14T15:55:00Z", 0.6],
@@ -37,6 +39,7 @@
     },
     {
       "metric": "checkout_api.p95_latency_ms",
+      "service": "checkout-api",
       "unit": "ms",
       "points": [
         ["2026-05-14T15:55:00Z", 240],
@@ -52,6 +55,7 @@
     },
     {
       "metric": "postgres_primary.active_connections_percent",
+      "service": "postgres-primary",
       "unit": "percent",
       "points": [
         ["2026-05-14T15:55:00Z", 44],
@@ -67,6 +71,7 @@
     },
     {
       "metric": "checkout_api.db_pool_waiters",
+      "service": "checkout-api",
       "unit": "requests",
       "points": [
         ["2026-05-14T15:55:00Z", 0],
@@ -82,6 +87,7 @@
     },
     {
       "metric": "checkout_api.cpu_percent",
+      "service": "checkout-api",
       "unit": "percent",
       "points": [
         ["2026-05-14T15:55:00Z", 39],

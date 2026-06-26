@@ -7,7 +7,12 @@
     "version": "2026.04.21.5",
     "strategy": "rolling",
     "status": "completed",
-    "initiated_by": "argo-rollouts"
+    "initiated_by": "argo-rollouts",
+    "commit_ids": [
+      "55b191e",
+      "d53c9e4",
+      "fbc8142"
+    ]
   },
   {
     "deployment_id": "catalog-prod-6108",
@@ -17,6 +22,7 @@
     "version": "2026.04.21.4",
     "strategy": "rollback",
     "status": "completed",
-    "initiated_by": "catalog-oncall"
+    "initiated_by": "catalog-oncall",
+    "commit_ids": []
   }
 ]

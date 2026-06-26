@@ -7,7 +7,11 @@
     "version": "2026.03.03.2",
     "strategy": "rolling",
     "status": "completed",
-    "initiated_by": "argo-rollouts"
+    "initiated_by": "argo-rollouts",
+    "commit_ids": [
+      "11c0d9a",
+      "892fd1c"
+    ]
   },
   {
     "deployment_id": "webhook-prod-3002",
@@ -17,6 +21,7 @@
     "version": "2026.03.03.1",
     "strategy": "rollback",
     "status": "completed",
-    "initiated_by": "incident-commander"
+    "initiated_by": "incident-commander",
+    "commit_ids": []
   }
 ]

@@ -131,15 +131,16 @@ Each incident contains:
 | `metrics.json` | Metric time series observed around the incident |
 | `logs.json` | Raw log events |
 | `timeline.json` | Human-readable event sequence |
+| `services.json` | Hard-incident service aliases and dependency topology |
 | `expected_rca.json` | Evaluation-only ground truth |
 
 ### 3.4 Dataset Observations
 
 - Medium and hard incidents include `operational_context`.
 - Hard incidents include `affected_services`.
-- No incident currently includes `services.json` topology.
-- No deployment currently includes explicit `commit_ids`.
-- Metrics currently do not consistently include explicit service ownership.
+- Hard incidents include `services.json` topology with service aliases and dependencies.
+- Deployment records include explicit `commit_ids` arrays for deterministic commit-to-deployment edges.
+- Metric series include explicit `service` ownership for deterministic metric-to-service edges.
 - All current `expected_rca.json` files have `confidence: high`, so medium/low confidence behavior needs simulated missing-evidence tests or future lightweight fixtures.
 
 ## 4. Graph Model
@@ -405,7 +406,7 @@ Do not redesign the dataset. Additions should be optional and lightweight.
 
 ### 11.1 Highest Value: `services.json`
 
-Add per-incident topology where distributed reasoning matters most, especially hard incidents.
+Hard incidents include per-incident topology where distributed reasoning matters most.
 
 Minimal format:
 
@@ -428,7 +429,7 @@ Runtime effect:
 
 ### 11.2 Useful: Deployment Commit Mapping
 
-Add optional `commit_ids` to deployment records when exact release membership is known.
+Deployment records include `commit_ids` when exact release membership is known. Empty arrays are valid for rollback or operational events with no associated commit in the fixture.
 
 Runtime effect:
 
@@ -436,7 +437,7 @@ Runtime effect:
 
 ### 11.3 Useful: Metric Service Ownership
 
-Add optional `service` to metric series.
+Metric series include `service`.
 
 Runtime effect:
 

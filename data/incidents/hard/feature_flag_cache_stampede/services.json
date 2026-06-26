@@ -1,0 +1,74 @@
+{
+  "services": [
+    {
+      "name": "feature-flag-control-plane",
+      "type": "api",
+      "aliases": [
+        "feature_flag_control_plane"
+      ]
+    },
+    {
+      "name": "config-cache",
+      "type": "cache",
+      "aliases": [
+        "config_cache"
+      ]
+    },
+    {
+      "name": "postgres-primary",
+      "type": "database",
+      "aliases": [
+        "postgres_primary"
+      ]
+    },
+    {
+      "name": "api-edge",
+      "type": "api"
+    },
+    {
+      "name": "experimentation-sdk-ingress",
+      "type": "api",
+      "aliases": [
+        "experimentation_sdk_ingress"
+      ]
+    },
+    {
+      "name": "cdn-probe",
+      "type": "synthetic-probe",
+      "aliases": [
+        "cdn_probe"
+      ]
+    },
+    {
+      "name": "launch-orchestrator",
+      "type": "control-plane"
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "api-edge",
+      "to": "feature-flag-control-plane",
+      "relationship": "calls"
+    },
+    {
+      "from": "experimentation-sdk-ingress",
+      "to": "feature-flag-control-plane",
+      "relationship": "calls"
+    },
+    {
+      "from": "feature-flag-control-plane",
+      "to": "config-cache",
+      "relationship": "reads_from"
+    },
+    {
+      "from": "feature-flag-control-plane",
+      "to": "postgres-primary",
+      "relationship": "persists_to"
+    },
+    {
+      "from": "launch-orchestrator",
+      "to": "feature-flag-control-plane",
+      "relationship": "updates"
+    }
+  ]
+}

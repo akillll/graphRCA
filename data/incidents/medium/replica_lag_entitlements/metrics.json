@@ -7,6 +7,7 @@
   "series": [
     {
       "metric": "entitlements_api.403_rate_percent",
+      "service": "entitlements-api",
       "unit": "percent",
       "points": [
         ["2026-04-09T01:50:00Z", 0.2],
@@ -28,6 +29,7 @@
     },
     {
       "metric": "billing_postgres.replica_lag_seconds",
+      "service": "billing-postgres",
       "unit": "seconds",
       "points": [
         ["2026-04-09T01:50:00Z", 1],
@@ -49,6 +51,7 @@
     },
     {
       "metric": "billing_postgres.primary_cpu_percent",
+      "service": "billing-postgres",
       "unit": "percent",
       "points": [
         ["2026-04-09T01:50:00Z", 33],
@@ -70,6 +73,7 @@
     },
     {
       "metric": "entitlements_api.cache_hit_rate_percent",
+      "service": "entitlements-api",
       "unit": "percent",
       "points": [
         ["2026-04-09T01:50:00Z", 94],
@@ -91,6 +95,7 @@
     },
     {
       "metric": "checkout_service.purchase_success_percent",
+      "service": "checkout-service",
       "unit": "percent",
       "points": [
         ["2026-04-09T01:50:00Z", 99.4],
@@ -112,6 +117,7 @@
     },
     {
       "metric": "entitlements_api.replica_read_share_percent",
+      "service": "entitlements-api",
       "unit": "percent",
       "points": [
         ["2026-04-09T01:50:00Z", 18],

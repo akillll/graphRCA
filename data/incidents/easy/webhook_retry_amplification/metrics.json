@@ -7,6 +7,7 @@
   "series": [
     {
       "metric": "webhook_dispatcher.queue_depth",
+      "service": "webhook-dispatcher",
       "unit": "jobs",
       "points": [
         ["2026-03-03T18:15:00Z", 42],
@@ -22,6 +23,7 @@
     },
     {
       "metric": "webhook_dispatcher.error_rate_percent",
+      "service": "webhook-dispatcher",
       "unit": "percent",
       "points": [
         ["2026-03-03T18:15:00Z", 0.8],
@@ -37,6 +39,7 @@
     },
     {
       "metric": "webhook_dispatcher.success_latency_p95_ms",
+      "service": "webhook-dispatcher",
       "unit": "ms",
       "points": [
         ["2026-03-03T18:15:00Z", 970],
@@ -52,6 +55,7 @@
     },
     {
       "metric": "partner_payroll_sync.probe_latency_p95_ms",
+      "service": "partner-payroll-sync",
       "unit": "ms",
       "points": [
         ["2026-03-03T18:15:00Z", 2280],
@@ -67,6 +71,7 @@
     },
     {
       "metric": "webhook_dispatcher.worker_cpu_percent",
+      "service": "webhook-dispatcher",
       "unit": "percent",
       "points": [
         ["2026-03-03T18:15:00Z", 33],
@@ -82,6 +87,7 @@
     },
     {
       "metric": "webhook_dispatcher.retry_rate_percent",
+      "service": "webhook-dispatcher",
       "unit": "percent",
       "points": [
         ["2026-03-03T18:15:00Z", 3],

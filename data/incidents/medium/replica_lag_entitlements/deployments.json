@@ -7,7 +7,10 @@
     "version": "nightly-2026-04-09",
     "strategy": "scheduled-job",
     "status": "started",
-    "initiated_by": "cron"
+    "initiated_by": "cron",
+    "commit_ids": [
+      "729d5be"
+    ]
   },
   {
     "deployment_id": "entitlements-prod-9101",
@@ -17,7 +20,11 @@
     "version": "2026.04.09.2",
     "strategy": "rolling",
     "status": "completed",
-    "initiated_by": "argo-rollouts"
+    "initiated_by": "argo-rollouts",
+    "commit_ids": [
+      "d8e0f14",
+      "6f11c7a"
+    ]
   },
   {
     "deployment_id": "entitlements-prod-9102",
@@ -27,6 +34,7 @@
     "version": "2026.04.09.1",
     "strategy": "rollback",
     "status": "completed",
-    "initiated_by": "incident-commander"
+    "initiated_by": "incident-commander",
+    "commit_ids": []
   }
 ]

@@ -7,6 +7,7 @@
   "series": [
     {
       "metric": "config_cache.hit_rate_percent",
+      "service": "config-cache",
       "unit": "percent",
       "points": [
         ["2026-04-14T12:50:00Z", 97],
@@ -34,6 +35,7 @@
     },
     {
       "metric": "feature_flag_control_plane.resolve_rps",
+      "service": "feature-flag-control-plane",
       "unit": "rps",
       "points": [
         ["2026-04-14T12:50:00Z", 5400],
@@ -61,6 +63,7 @@
     },
     {
       "metric": "postgres_primary.cpu_percent",
+      "service": "postgres-primary",
       "unit": "percent",
       "points": [
         ["2026-04-14T12:50:00Z", 36],
@@ -88,6 +91,7 @@
     },
     {
       "metric": "experimentation_sdk_ingress.retry_rate_percent",
+      "service": "experimentation-sdk-ingress",
       "unit": "percent",
       "points": [
         ["2026-04-14T12:50:00Z", 2],
@@ -115,6 +119,7 @@
     },
     {
       "metric": "cdn_probe.p95_latency_ms",
+      "service": "cdn-probe",
       "unit": "ms",
       "points": [
         ["2026-04-14T12:50:00Z", 84],
@@ -142,6 +147,7 @@
     },
     {
       "metric": "feature_flag_control_plane.invalidate_events_per_min",
+      "service": "feature-flag-control-plane",
       "unit": "events",
       "points": [
         ["2026-04-14T12:50:00Z", 40],

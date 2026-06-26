@@ -7,7 +7,12 @@
     "version": "2026.05.22.4",
     "strategy": "rolling",
     "status": "completed",
-    "initiated_by": "argo-rollouts"
+    "initiated_by": "argo-rollouts",
+    "commit_ids": [
+      "5cd88a1",
+      "0e4a7dd",
+      "a3bd1ef"
+    ]
   },
   {
     "deployment_id": "campaign-asset-announce-11",
@@ -17,7 +22,8 @@
     "version": "profile-refresh-may",
     "strategy": "scheduled-event",
     "status": "started",
-    "initiated_by": "marketing-ops"
+    "initiated_by": "marketing-ops",
+    "commit_ids": []
   },
   {
     "deployment_id": "media-prod-2202",
@@ -27,6 +33,7 @@
     "version": "2026.05.22.3",
     "strategy": "rollback",
     "status": "completed",
-    "initiated_by": "incident-commander"
+    "initiated_by": "incident-commander",
+    "commit_ids": []
   }
 ]

@@ -1,0 +1,94 @@
+{
+  "services": [
+    {
+      "name": "checkout-orchestrator",
+      "type": "api",
+      "aliases": [
+        "checkout_orchestrator"
+      ]
+    },
+    {
+      "name": "pricing-api",
+      "type": "api",
+      "aliases": [
+        "pricing_api"
+      ]
+    },
+    {
+      "name": "inventory-api",
+      "type": "api",
+      "aliases": [
+        "inventory_api"
+      ]
+    },
+    {
+      "name": "payment-adapter",
+      "type": "api",
+      "aliases": [
+        "payment_adapter"
+      ]
+    },
+    {
+      "name": "mesh-sidecar",
+      "type": "proxy",
+      "aliases": [
+        "mesh_sidecar"
+      ]
+    },
+    {
+      "name": "mesh-routing-policy",
+      "type": "control-plane"
+    },
+    {
+      "name": "inventory-platform",
+      "type": "platform"
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "checkout-orchestrator",
+      "to": "pricing-api",
+      "relationship": "calls"
+    },
+    {
+      "from": "checkout-orchestrator",
+      "to": "inventory-api",
+      "relationship": "calls"
+    },
+    {
+      "from": "checkout-orchestrator",
+      "to": "payment-adapter",
+      "relationship": "calls"
+    },
+    {
+      "from": "checkout-orchestrator",
+      "to": "mesh-sidecar",
+      "relationship": "uses"
+    },
+    {
+      "from": "pricing-api",
+      "to": "mesh-sidecar",
+      "relationship": "uses"
+    },
+    {
+      "from": "inventory-api",
+      "to": "mesh-sidecar",
+      "relationship": "uses"
+    },
+    {
+      "from": "payment-adapter",
+      "to": "mesh-sidecar",
+      "relationship": "uses"
+    },
+    {
+      "from": "mesh-routing-policy",
+      "to": "mesh-sidecar",
+      "relationship": "configures"
+    },
+    {
+      "from": "inventory-platform",
+      "to": "inventory-api",
+      "relationship": "operates"
+    }
+  ]
+}

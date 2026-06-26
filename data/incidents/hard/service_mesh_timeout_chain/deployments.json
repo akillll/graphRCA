@@ -7,7 +7,10 @@
     "version": "kernel-patch-window",
     "strategy": "maintenance-operation",
     "status": "started",
-    "initiated_by": "platform-ops"
+    "initiated_by": "platform-ops",
+    "commit_ids": [
+      "bc7a9e8"
+    ]
   },
   {
     "deployment_id": "mesh-policy-2001",
@@ -17,7 +20,11 @@
     "version": "2026.03.07.2",
     "strategy": "rolling",
     "status": "completed",
-    "initiated_by": "argo-rollouts"
+    "initiated_by": "argo-rollouts",
+    "commit_ids": [
+      "92ac103",
+      "4f1d201"
+    ]
   },
   {
     "deployment_id": "mesh-policy-2002",
@@ -27,6 +34,7 @@
     "version": "2026.03.07.1",
     "strategy": "rollback",
     "status": "completed",
-    "initiated_by": "incident-commander"
+    "initiated_by": "incident-commander",
+    "commit_ids": []
   }
 ]

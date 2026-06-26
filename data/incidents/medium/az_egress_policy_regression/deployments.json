@@ -7,7 +7,10 @@
     "version": "app-general-us-east-1c-patched-ami",
     "strategy": "node-rotation",
     "status": "started",
-    "initiated_by": "platform-ops"
+    "initiated_by": "platform-ops",
+    "commit_ids": [
+      "d8724a0"
+    ]
   },
   {
     "deployment_id": "auth-netpol-7701",
@@ -17,7 +20,11 @@
     "version": "2026.02.27.1",
     "strategy": "rolling",
     "status": "completed",
-    "initiated_by": "argo-rollouts"
+    "initiated_by": "argo-rollouts",
+    "commit_ids": [
+      "b14c6d2",
+      "2f9d8bb"
+    ]
   },
   {
     "deployment_id": "auth-netpol-7702",
@@ -27,6 +34,7 @@
     "version": "2026.02.26.9",
     "strategy": "rollback",
     "status": "completed",
-    "initiated_by": "incident-commander"
+    "initiated_by": "incident-commander",
+    "commit_ids": []
   }
 ]

@@ -7,6 +7,7 @@
   "series": [
     {
       "metric": "checkout_orchestrator.error_rate_percent",
+      "service": "checkout-orchestrator",
       "unit": "percent",
       "points": [
         ["2026-03-07T19:00:00Z", 0.6],
@@ -33,6 +34,7 @@
     },
     {
       "metric": "mesh_sidecar.retry_rate_percent",
+      "service": "mesh-sidecar",
       "unit": "percent",
       "points": [
         ["2026-03-07T19:00:00Z", 3],
@@ -59,6 +61,7 @@
     },
     {
       "metric": "inventory_api.reservation_queue_depth",
+      "service": "inventory-api",
       "unit": "jobs",
       "points": [
         ["2026-03-07T19:00:00Z", 41],
@@ -85,6 +88,7 @@
     },
     {
       "metric": "payment_adapter.provider_p95_ms",
+      "service": "payment-adapter",
       "unit": "ms",
       "points": [
         ["2026-03-07T19:00:00Z", 208],
@@ -111,6 +115,7 @@
     },
     {
       "metric": "pricing_api.cache_hit_rate_percent",
+      "service": "pricing-api",
       "unit": "percent",
       "points": [
         ["2026-03-07T19:00:00Z", 94],
@@ -137,6 +142,7 @@
     },
     {
       "metric": "mesh_sidecar.cross_zone_routing_percent",
+      "service": "mesh-sidecar",
       "unit": "percent",
       "points": [
         ["2026-03-07T19:00:00Z", 6],

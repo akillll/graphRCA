@@ -7,6 +7,7 @@
   "series": [
     {
       "metric": "catalog_api.request_rate_rps",
+      "service": "catalog-api",
       "unit": "rps",
       "points": [
         ["2026-04-21T13:00:00Z", 420],
@@ -22,6 +23,7 @@
     },
     {
       "metric": "catalog_api.error_rate_percent",
+      "service": "catalog-api",
       "unit": "percent",
       "points": [
         ["2026-04-21T13:00:00Z", 0.3],
@@ -37,6 +39,7 @@
     },
     {
       "metric": "catalog_api.p95_latency_ms",
+      "service": "catalog-api",
       "unit": "ms",
       "points": [
         ["2026-04-21T13:00:00Z", 118],
@@ -52,6 +55,7 @@
     },
     {
       "metric": "redis_cache_a.hit_rate_percent",
+      "service": "redis-cache-a",
       "unit": "percent",
       "points": [
         ["2026-04-21T13:00:00Z", 96],
@@ -67,6 +71,7 @@
     },
     {
       "metric": "postgres_read_replica.cpu_percent",
+      "service": "postgres-read-replica",
       "unit": "percent",
       "points": [
         ["2026-04-21T13:00:00Z", 28],
@@ -82,6 +87,7 @@
     },
     {
       "metric": "redis_cache_a.evictions_per_sec",
+      "service": "redis-cache-a",
       "unit": "ops",
       "points": [
         ["2026-04-21T13:00:00Z", 2],

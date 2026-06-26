@@ -7,7 +7,10 @@
     "version": "scheduled-evening-rebalance",
     "strategy": "maintenance-operation",
     "status": "started",
-    "initiated_by": "platform-ops"
+    "initiated_by": "platform-ops",
+    "commit_ids": [
+      "1ff64aa"
+    ]
   },
   {
     "deployment_id": "gateway-prod-6001",
@@ -17,7 +20,11 @@
     "version": "2026.05.03.6",
     "strategy": "rolling",
     "status": "completed",
-    "initiated_by": "argo-rollouts"
+    "initiated_by": "argo-rollouts",
+    "commit_ids": [
+      "c1827ef",
+      "ea92b13"
+    ]
   },
   {
     "deployment_id": "gateway-prod-6002",
@@ -27,6 +34,7 @@
     "version": "2026.05.03.5",
     "strategy": "rollback",
     "status": "completed",
-    "initiated_by": "incident-commander"
+    "initiated_by": "incident-commander",
+    "commit_ids": []
   }
 ]

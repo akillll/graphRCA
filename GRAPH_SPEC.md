@@ -71,6 +71,7 @@ Optional fields:
 - `type`
 - `environment`
 - `tier`
+- `aliases`
 
 Canonical ID:
 
@@ -98,6 +99,7 @@ Required fields:
 Optional fields:
 
 - `initiated_by`
+- `commit_ids`
 
 Canonical ID:
 
@@ -176,6 +178,7 @@ Optional fields:
 - `max_value`
 - `first_anomalous_at`
 - `direction`
+- `service`
 
 Canonical ID:
 
@@ -366,6 +369,7 @@ Optional fields:
 
 - `event_type`
 - `linked_node_id`
+- `references`
 
 Canonical ID:
 
@@ -436,7 +440,7 @@ Example:
 
 - `Service -> Service`
 
-Deterministic only when supplied by a future lightweight topology file. LLM-inferred service dependencies are allowed only as inferred edges and should not be used as hard proof.
+Deterministic only when supplied by `services.json` or another explicit topology file. LLM-inferred service dependencies are allowed only as inferred edges and should not be used as hard proof.
 
 ### CHANGED
 
@@ -550,6 +554,13 @@ Slug rules:
 - strip leading and trailing `_`
 - keep IDs stable across reruns
 
+Sequence rules:
+
+- For `LogEvent`, use `trace_id` when present. If `trace_id` is missing, use the zero-based array index from `logs.json` as `seq_{index}`.
+- For `TimelineEvent`, use the zero-based array index from `timeline.json`.
+- Sequence values are based on source file order and must not be re-sorted before ID construction.
+- Timestamp ordering may be used for `OCCURRED_AFTER` edges after IDs are built.
+
 ## Graph Construction Pipeline
 
 ### Deterministic Extraction
@@ -565,6 +576,7 @@ Nodes:
 - `Hypothesis` nodes from `primary_hypotheses` with status `candidate`
 - `Configuration` nodes from `operational_context`, when present
 - `Service` nodes from `affected_services`, when present
+- `Service` nodes and aliases from `services.json`, when present
 
 Edges:
 
@@ -573,8 +585,17 @@ Edges:
 - `Configuration -> Incident` via `OBSERVED_IN`
 - `Incident -> Runbook` via `MATCHES` for explicit `relevant_runbooks`
 - `Incident -> Service` via `OBSERVED_ON` for `affected_services`
+- `Service -> Service` via `DEPENDS_ON` from `services.json.dependencies`, when present
 
 Do not derive service-to-service `DEPENDS_ON` from `affected_services`; the array indicates involvement, not topology.
+
+If `metadata.operational_context` entries are strings, create `Configuration` nodes with:
+
+- `kind: "operational_context"`
+- `source_field: "operational_context"`
+- `text` equal to the string value
+
+If an entry is an object in a future fixture, preserve explicit `kind`, `service`, and `timestamp` when present.
 
 #### `deployments.json`
 
@@ -588,6 +609,7 @@ Edges:
 - `Deployment -> Incident` via `OBSERVED_IN`
 - `Deployment -> Service` via `OBSERVED_ON`
 - `Incident -> Deployment` via `OCCURRED_AFTER` when deployment timestamp precedes incident start or occurs during the incident window
+- `Commit -> Deployment` via `INCLUDED_IN` for each explicit `commit_ids` entry
 
 Rollback or maintenance status should be stored as properties, not causal truth.
 
@@ -600,8 +622,10 @@ Nodes:
 Edges:
 
 - `Commit -> Incident` via `OBSERVED_IN`
-- `Commit -> Deployment` via `INCLUDED_IN` only as incident-window association unless exact release mapping is added
+- `Commit -> Deployment` via `INCLUDED_IN` when a deployment explicitly lists the commit ID
 - `Commit -> Service` via `CHANGED` when file paths or commit messages clearly identify a service
+
+If `deployments.json.commit_ids` is absent, do not create deterministic `INCLUDED_IN` edges. Use an implementation-local association only for retrieval ranking and label it as non-exact.
 
 #### `metrics.json`
 
@@ -614,9 +638,20 @@ Edges:
 
 - `MetricSeries -> Metric` via `REFERENCES`
 - `MetricSeries -> Incident` via `OBSERVED_IN`
-- `MetricSeries -> Service` via `OBSERVED_ON` when service can be derived from metric naming or future mapping
+- `MetricSeries -> Service` via `OBSERVED_ON` from the explicit `service` field
 
 Implementation may compute optional summary properties such as baseline, min, max, direction, and first anomaly time, but raw points should remain available for citation.
+
+Deterministic metric summary rules:
+
+- `baseline_value`: median of points with timestamps before `metadata.start_time`; if no pre-incident points exist, use the first point.
+- `min_value`: minimum value across all points.
+- `max_value`: maximum value across all points.
+- `observed_value`: the most extreme value during `[metadata.start_time, metadata.end_time]`; choose `max_value` when direction is `up`, `min_value` when direction is `down`.
+- `direction`: compare incident-window median to `baseline_value`; use `up` if higher, `down` if lower, `flat` if equal.
+- `first_anomalous_at`: first incident-window timestamp whose value differs from `baseline_value` by at least 20 percent. For baseline zero, use the first non-zero incident-window point.
+
+These summaries are helper properties for ranking and explanation. Citations should still reference raw point values.
 
 #### `logs.json`
 
@@ -641,7 +676,9 @@ Edges:
 
 - `TimelineEvent -> Incident` via `OBSERVED_IN`
 - `TimelineEvent -> TimelineEvent` via `OCCURRED_AFTER` for adjacent timestamp ordering
-- `TimelineEvent -> Deployment`, `MetricSeries`, `LogPattern`, or `Hypothesis` via `REFERENCES` when matching is reliable
+- `TimelineEvent -> Deployment`, `MetricSeries`, `LogPattern`, or `Hypothesis` via `REFERENCES` from explicit `references`, when present
+
+Do not create deterministic timeline reference edges from prose matching alone. Prose matching may produce LLM-assisted `REFERENCES` edges with confidence and rationale.
 
 #### `runbooks/*.md`
 
@@ -820,7 +857,7 @@ The runtime graph may ingest:
 - `logs.json`
 - `timeline.json`
 - `runbooks/*.md`
-- future lightweight topology files
+- `services.json` topology files
 
 ### Evaluation Data
 
@@ -876,6 +913,10 @@ Every incident directory contains:
 - `timeline.json`
 - `expected_rca.json`
 
+Hard incident directories also contain:
+
+- `services.json`
+
 ### File Mapping
 
 | File | Runtime Nodes | Runtime Edges | Method |
@@ -887,15 +928,18 @@ Every incident directory contains:
 | `logs.json` | LogEvent, Service | OBSERVED_IN, OBSERVED_ON | deterministic |
 | `timeline.json` | TimelineEvent | OBSERVED_IN, OCCURRED_AFTER, REFERENCES | deterministic plus optional matching |
 | `runbooks/*.md` | Runbook, Action | RECOMMENDS, MATCHES | deterministic headings plus LLM-assisted extraction |
+| `services.json` | Service | DEPENDS_ON | deterministic |
 | `expected_rca.json` | none | none | evaluation-only |
 
-### Minimal Dataset Additions Recommended
+### Minimal Dataset Additions Status
 
 Do not redesign the dataset. Add only low-risk files or fields that materially improve graph traversal.
 
-#### 1. Add optional `services.json` per incident
+#### 1. `services.json` per hard incident
 
-Purpose: encode service topology for medium/hard distributed reasoning.
+Status: added for hard incidents.
+
+Purpose: encode service topology for distributed reasoning.
 
 Recommended minimal format:
 
@@ -920,7 +964,9 @@ Graph mapping:
 
 This is the highest-value addition because hard incidents require multiple affected services, but current `affected_services` arrays do not encode dependency direction.
 
-#### 2. Add optional deployment-to-commit mapping
+#### 2. Deployment-to-commit mapping
+
+Status: added as `commit_ids` on deployment records.
 
 Purpose: avoid pretending every nearby commit was included in every deployment.
 
@@ -936,7 +982,9 @@ Graph mapping:
 
 If omitted, implementations must label commit/deployment edges as incident-window associations.
 
-#### 3. Add optional metric service mapping
+#### 3. Metric service mapping
+
+Status: added as `service` on every metric series.
 
 Purpose: avoid brittle service inference from metric names.
 
@@ -950,7 +998,25 @@ Graph mapping:
 
 - create deterministic `MetricSeries -> Service` `OBSERVED_ON` edges
 
-#### 4. Keep `expected_investigation_path`, but add optional machine-readable hints
+#### 4. Optional timeline references
+
+Status: not required for initial implementation.
+
+Purpose: create exact timeline-to-evidence references without prose matching.
+
+Recommended optional field on timeline events:
+
+```json
+"references": ["deployment:catalog-prod-6107"]
+```
+
+Graph mapping:
+
+- create deterministic `TimelineEvent -> referenced node` `REFERENCES` edges
+
+If omitted, only adjacent timeline ordering is deterministic.
+
+#### 5. Keep `expected_investigation_path`, but add optional machine-readable hints
 
 Purpose: improve traversal scoring without rewriting ground truth.
 

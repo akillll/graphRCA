@@ -7,7 +7,11 @@
     "version": "2026.01.18.3",
     "strategy": "rolling",
     "status": "completed",
-    "initiated_by": "argo-rollouts"
+    "initiated_by": "argo-rollouts",
+    "commit_ids": [
+      "8a71c22",
+      "0d24f7c"
+    ]
   },
   {
     "deployment_id": "event-failover-7701",
@@ -17,7 +21,10 @@
     "version": "us-west-2-shift-70",
     "strategy": "regional-failover",
     "status": "started",
-    "initiated_by": "incident-automation"
+    "initiated_by": "incident-automation",
+    "commit_ids": [
+      "f5b4081"
+    ]
   },
   {
     "deployment_id": "eic-prod-3002",
@@ -27,6 +34,7 @@
     "version": "2026.01.18.2",
     "strategy": "rollback",
     "status": "completed",
-    "initiated_by": "incident-commander"
+    "initiated_by": "incident-commander",
+    "commit_ids": []
   }
 ]

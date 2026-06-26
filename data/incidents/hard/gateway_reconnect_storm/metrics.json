@@ -7,6 +7,7 @@
   "series": [
     {
       "metric": "gateway.disconnects_per_min",
+      "service": "realtime-gateway",
       "unit": "connections",
       "points": [
         ["2026-05-03T16:45:00Z", 1400],
@@ -33,6 +34,7 @@
     },
     {
       "metric": "gateway.resume_rejection_percent",
+      "service": "realtime-gateway",
       "unit": "percent",
       "points": [
         ["2026-05-03T16:45:00Z", 0.8],
@@ -59,6 +61,7 @@
     },
     {
       "metric": "session_store.redis_cpu_percent",
+      "service": "session-store",
       "unit": "percent",
       "points": [
         ["2026-05-03T16:45:00Z", 31],
@@ -85,6 +88,7 @@
     },
     {
       "metric": "auth_api.introspection_p95_ms",
+      "service": "auth-api",
       "unit": "ms",
       "points": [
         ["2026-05-03T16:45:00Z", 118],
@@ -111,6 +115,7 @@
     },
     {
       "metric": "edge_probe.packet_loss_percent",
+      "service": "edge-probe",
       "unit": "percent",
       "points": [
         ["2026-05-03T16:45:00Z", 0.1],
@@ -137,6 +142,7 @@
     },
     {
       "metric": "gateway.identify_requests_per_min",
+      "service": "realtime-gateway",
       "unit": "requests",
       "points": [
         ["2026-05-03T16:45:00Z", 6200],

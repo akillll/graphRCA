@@ -7,6 +7,7 @@
   "series": [
     {
       "metric": "media_worker.upload_jobs_per_min",
+      "service": "media-worker",
       "unit": "jobs",
       "points": [
         ["2026-05-22T11:00:00Z", 980],
@@ -30,6 +31,7 @@
     },
     {
       "metric": "media_worker.queue_depth",
+      "service": "media-worker",
       "unit": "jobs",
       "points": [
         ["2026-05-22T11:00:00Z", 44],
@@ -53,6 +55,7 @@
     },
     {
       "metric": "media_worker.memory_rss_p95_mb",
+      "service": "media-worker",
       "unit": "mb",
       "points": [
         ["2026-05-22T11:00:00Z", 428],
@@ -76,6 +79,7 @@
     },
     {
       "metric": "media_worker.container_restarts",
+      "service": "media-worker",
       "unit": "count",
       "points": [
         ["2026-05-22T11:00:00Z", 0],
@@ -99,6 +103,7 @@
     },
     {
       "metric": "s3_gateway.p95_latency_ms",
+      "service": "s3-gateway",
       "unit": "ms",
       "points": [
         ["2026-05-22T11:00:00Z", 82],
@@ -122,6 +127,7 @@
     },
     {
       "metric": "media_worker.cpu_p95_percent",
+      "service": "media-worker",
       "unit": "percent",
       "points": [
         ["2026-05-22T11:00:00Z", 46],

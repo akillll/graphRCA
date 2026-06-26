@@ -7,7 +7,10 @@
     "version": "corp-azimuth-to-shard-7",
     "strategy": "config-change",
     "status": "completed",
-    "initiated_by": "platform-ops"
+    "initiated_by": "platform-ops",
+    "commit_ids": [
+      "912d4f2"
+    ]
   },
   {
     "deployment_id": "notif-auto-3101",
@@ -17,7 +20,11 @@
     "version": "2026.03.18.3",
     "strategy": "rolling",
     "status": "completed",
-    "initiated_by": "argo-rollouts"
+    "initiated_by": "argo-rollouts",
+    "commit_ids": [
+      "4b0ca93",
+      "1a7b210"
+    ]
   },
   {
     "deployment_id": "notif-auto-3102",
@@ -27,6 +34,7 @@
     "version": "2026.03.18.2",
     "strategy": "rollback",
     "status": "completed",
-    "initiated_by": "incident-commander"
+    "initiated_by": "incident-commander",
+    "commit_ids": []
   }
 ]

@@ -7,7 +7,11 @@
     "version": "2026.04.14.4",
     "strategy": "rolling",
     "status": "completed",
-    "initiated_by": "argo-rollouts"
+    "initiated_by": "argo-rollouts",
+    "commit_ids": [
+      "5bca9f3",
+      "f104dd8"
+    ]
   },
   {
     "deployment_id": "spring-launch-1901",
@@ -17,7 +21,10 @@
     "version": "spring-launch-policy",
     "strategy": "scheduled-launch",
     "status": "started",
-    "initiated_by": "growth-ops"
+    "initiated_by": "growth-ops",
+    "commit_ids": [
+      "6d22a4c"
+    ]
   },
   {
     "deployment_id": "flags-prod-4002",
@@ -27,6 +34,7 @@
     "version": "2026.04.14.3",
     "strategy": "rollback",
     "status": "completed",
-    "initiated_by": "incident-commander"
+    "initiated_by": "incident-commander",
+    "commit_ids": []
   }
 ]

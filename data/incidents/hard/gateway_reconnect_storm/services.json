@@ -1,0 +1,71 @@
+{
+  "services": [
+    {
+      "name": "realtime-gateway",
+      "type": "api",
+      "aliases": [
+        "gateway"
+      ]
+    },
+    {
+      "name": "session-store",
+      "type": "cache",
+      "aliases": [
+        "session_store"
+      ]
+    },
+    {
+      "name": "auth-api",
+      "type": "api",
+      "aliases": [
+        "auth_api"
+      ]
+    },
+    {
+      "name": "edge-proxy",
+      "type": "proxy"
+    },
+    {
+      "name": "shard-balancer",
+      "type": "control-plane"
+    },
+    {
+      "name": "edge-probe",
+      "type": "synthetic-probe",
+      "aliases": [
+        "edge_probe"
+      ]
+    },
+    {
+      "name": "client-relay",
+      "type": "api"
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "edge-proxy",
+      "to": "realtime-gateway",
+      "relationship": "routes_to"
+    },
+    {
+      "from": "client-relay",
+      "to": "realtime-gateway",
+      "relationship": "connects_to"
+    },
+    {
+      "from": "realtime-gateway",
+      "to": "session-store",
+      "relationship": "reads_from"
+    },
+    {
+      "from": "realtime-gateway",
+      "to": "auth-api",
+      "relationship": "calls"
+    },
+    {
+      "from": "shard-balancer",
+      "to": "realtime-gateway",
+      "relationship": "moves_shards_for"
+    }
+  ]
+}

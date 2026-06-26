@@ -1,0 +1,69 @@
+{
+  "services": [
+    {
+      "name": "event-ingestion-consumer",
+      "type": "consumer",
+      "aliases": [
+        "event-ingestion-pipeline",
+        "event_ingestion_consumer",
+        "consumer_group"
+      ]
+    },
+    {
+      "name": "kafka-broker",
+      "type": "queue",
+      "aliases": [
+        "kafka_broker"
+      ]
+    },
+    {
+      "name": "dedup-cache",
+      "type": "cache",
+      "aliases": [
+        "dedup_cache"
+      ]
+    },
+    {
+      "name": "notification-worker",
+      "type": "worker",
+      "aliases": [
+        "notification_worker"
+      ]
+    },
+    {
+      "name": "analytics-writer",
+      "type": "worker"
+    },
+    {
+      "name": "traffic-manager",
+      "type": "control-plane"
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "event-ingestion-consumer",
+      "to": "kafka-broker",
+      "relationship": "consumes_from"
+    },
+    {
+      "from": "event-ingestion-consumer",
+      "to": "dedup-cache",
+      "relationship": "uses"
+    },
+    {
+      "from": "notification-worker",
+      "to": "event-ingestion-consumer",
+      "relationship": "downstream_of"
+    },
+    {
+      "from": "analytics-writer",
+      "to": "event-ingestion-consumer",
+      "relationship": "downstream_of"
+    },
+    {
+      "from": "traffic-manager",
+      "to": "event-ingestion-consumer",
+      "relationship": "routes_to"
+    }
+  ]
+}
