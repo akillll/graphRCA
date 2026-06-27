@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
+import json
 import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
-
-from dotenv import dotenv_values
 
 from ingestion.types import GraphEdge, GraphNode, IngestionResult, NodeLabel, provenance_to_dict
 
@@ -21,6 +20,14 @@ class IngestStats:
 
     nodes_created_or_seen: int = 0
     edges_created_or_seen: int = 0
+
+
+@dataclass(slots=True)
+class GraphCounts:
+    """Current graph counts used for idempotency checks."""
+
+    node_count: int = 0
+    edge_count: int = 0
 
 
 class Neo4jLoader:
@@ -112,6 +119,13 @@ class Neo4jLoader:
             edges_created_or_seen=len(result.edges),
         )
 
+    def graph_counts(self) -> GraphCounts:
+        """Return current total node and relationship counts from Neo4j."""
+        with self._driver.session(database=self._database) as session:
+            node_count = session.execute_read(self._count_nodes)
+            edge_count = session.execute_read(self._count_edges)
+        return GraphCounts(node_count=node_count, edge_count=edge_count)
+
     @staticmethod
     def _create_driver(*, uri: str, username: str, password: str) -> "Driver":
         """Create a Neo4j driver lazily so the module imports without the package installed."""
@@ -147,21 +161,53 @@ class Neo4jLoader:
             properties=_edge_properties(edge),
         )
 
+    @staticmethod
+    def _count_nodes(tx: Any) -> int:
+        """Count all nodes currently present in the target Neo4j database."""
+        record = tx.run("MATCH (n) RETURN count(n) AS count").single()
+        return int(record["count"])
+
+    @staticmethod
+    def _count_edges(tx: Any) -> int:
+        """Count all relationships currently present in the target Neo4j database."""
+        record = tx.run("MATCH ()-[r]->() RETURN count(r) AS count").single()
+        return int(record["count"])
+
 
 def _node_properties(node: GraphNode) -> dict[str, Any]:
     """Flatten canonical node properties and provenance into one Neo4j property map."""
-    return {
+    return _sanitize_properties_for_neo4j({
         **dict(node.properties),
         **provenance_to_dict(node.provenance),
-    }
+    })
 
 
 def _edge_properties(edge: GraphEdge) -> dict[str, Any]:
     """Flatten canonical edge properties and provenance into one Neo4j property map."""
-    return {
+    return _sanitize_properties_for_neo4j({
         **dict(edge.properties),
         **provenance_to_dict(edge.provenance),
-    }
+    })
+
+
+def _sanitize_properties_for_neo4j(properties: dict[str, Any]) -> dict[str, Any]:
+    """Convert unsupported property values into Neo4j-storable equivalents."""
+    return {key: _to_neo4j_value(value) for key, value in properties.items()}
+
+
+def _to_neo4j_value(value: Any) -> Any:
+    """Return a Neo4j-storable value, serializing nested structures to JSON strings."""
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    if isinstance(value, tuple):
+        value = list(value)
+    if isinstance(value, list):
+        if all(item is None or isinstance(item, (str, int, float, bool)) for item in value):
+            return value
+        return json.dumps(value, separators=(",", ":"), sort_keys=False)
+    if isinstance(value, dict):
+        return json.dumps(value, separators=(",", ":"), sort_keys=True)
+    return str(value)
 
 
 def _allowed_labels() -> tuple[NodeLabel, ...]:
@@ -188,4 +234,10 @@ def _load_env_file(env_path: str | Path) -> dict[str, str]:
     path = Path(env_path)
     if not path.exists():
         return {}
+    try:
+        from dotenv import dotenv_values
+    except ImportError as exc:
+        raise ImportError(
+            "The python-dotenv package is required to load Neo4j settings from .env."
+        ) from exc
     return {key: value for key, value in dotenv_values(path).items() if value is not None}

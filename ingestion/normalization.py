@@ -29,6 +29,7 @@ def normalize_result(result: IngestionResult) -> IngestionResult:
 
         existing.properties = _merge_node_properties(existing, node)
 
+    _resolve_service_alias_conflicts(node_index, normalized.warnings)
     normalized.nodes = list(node_index.values())
     valid_node_ids = {node.id for node in normalized.nodes}
 
@@ -166,6 +167,35 @@ def _merge_aliases(left: Any, right: Any) -> list[str]:
         seen.add(alias)
         merged.append(alias)
     return merged
+
+
+def _resolve_service_alias_conflicts(node_index: dict[str, GraphNode], warnings: list[str]) -> None:
+    """Remove Service aliases that collide with another canonical service name."""
+    service_nodes = [node for node in node_index.values() if node.label == "Service"]
+    service_name_to_id = {
+        str(node.properties.get("name")).strip(): node.id
+        for node in service_nodes
+        if isinstance(node.properties.get("name"), str) and str(node.properties.get("name")).strip()
+    }
+
+    for node in service_nodes:
+        aliases = node.properties.get("aliases")
+        if not isinstance(aliases, list):
+            continue
+        filtered_aliases: list[str] = []
+        for alias in aliases:
+            alias_name = str(alias).strip()
+            owner_id = service_name_to_id.get(alias_name)
+            if owner_id is not None and owner_id != node.id:
+                warnings.append(
+                    f"Removed alias '{alias_name}' from '{node.id}' because it matches canonical service '{owner_id}'."
+                )
+                continue
+            filtered_aliases.append(alias_name)
+        if filtered_aliases:
+            node.properties["aliases"] = filtered_aliases
+        else:
+            node.properties.pop("aliases", None)
 
 
 def _merge_list_values(left: list[Any], right: list[Any]) -> list[Any]:

@@ -509,6 +509,11 @@ This field must remain evaluation-only.
 
 ### Phase 3 - Minimal LLM-Assisted Extraction
 
+Implementation ordering note:
+
+- Keep LLM enrichment as an add-on after the full deterministic ingestion, retrieval, validation, and loading flow is working end to end.
+- Do not block the base graph pipeline on LLM-assisted extraction.
+
 - Extract log patterns.
 - Extract runbook actions if needed.
 - Generate hypothesis `SUPPORTS` and `RULES_OUT` edges with provenance.
