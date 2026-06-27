@@ -1,0 +1,16 @@
+[
+  {
+    "timestamp": "2026-01-01T00:00:00Z",
+    "level": "INFO",
+    "service": "svc-a",
+    "component": "worker",
+    "message": "first"
+  },
+  {
+    "timestamp": "2026-01-01T00:00:01Z",
+    "level": "WARN",
+    "service": "svc-a",
+    "component": "worker",
+    "message": "second"
+  }
+]
