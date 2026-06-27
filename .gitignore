@@ -1,0 +1,102 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.hypothesis/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Packaging / build
+build/
+dist/
+site/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Local environment / secrets
+.env
+.env.*
+!.env.example
+!.env.sample
+*.local
+
+# Logs / runtime state
+*.log
+logs/
+tmp/
+temp/
+*.pid
+*.pid.lock
+
+# Chainlit
+.chainlit/
+.files/
+
+# LLM / embeddings / local model artifacts
+models/
+model/
+llm model/
+*.gguf
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.onnx
+*.parquet
+faiss_index/
+chroma/
+chroma_db/
+vectordb/
+
+# Neo4j / graph database local state
+neo4j_data/
+neo4j_logs/
+neo4j_plugins/
+neo4j_import/
+
+# Docker / compose local overrides
+docker-compose.override.yml
+*.tar
+
+# Test / benchmark outputs
+artifacts/
+reports/
+coverage/
+evaluation_outputs/
+benchmark_outputs/
+
+# Misc generated data
+*.sqlite
+*.sqlite3
+*.db
+
+# Keep real dataset content tracked
+!data/
+!data/**

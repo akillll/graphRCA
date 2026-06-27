@@ -199,7 +199,44 @@ Implementation must follow these principles:
 | UI | Chainlit | Step-based investigation display |
 | Runtime | Docker Compose | One-command local demo |
 
-### 5.2 Architecture Flow
+### 5.2 Recommended Codebase Layout
+
+The following structure is a good fit for the weekend build because it separates deterministic parsing, LLM-assisted enrichment, graph retrieval, prompt construction, API wiring, and offline evaluation without introducing too many layers:
+
+```text
+graphRCA/
+├── ingestion/
+│   ├── deterministic/
+│   │   ├── metadata.py
+│   │   ├── deployments.py
+│   │   ├── commits.py
+│   │   ├── metrics.py
+│   │   ├── logs.py
+│   │   └── timeline.py
+│   └── llm/
+│       ├── log_patterns.py
+│       ├── hypothesis_scoring.py
+│       └── runbook_matching.py
+├── retrieval/
+├── prompting/
+├── api/
+└── evaluation/
+```
+
+Responsibilities:
+
+- `ingestion/deterministic/`: parse source files into canonical nodes and deterministic edges
+- `ingestion/llm/`: semantic extraction that adds provenance-tagged nodes or edges
+- `retrieval/`: Neo4j access, Cypher queries, graph traversal, neighborhood expansion, and evidence assembly
+- `prompting/`: structured prompt builders for entity extraction and RCA generation
+- `api/`: FastAPI routes, response schemas, and app wiring
+- `evaluation/`: benchmark runners and scoring against `expected_rca.json`
+
+Implementation note:
+
+- Keep graph-specific code such as Neo4j client setup, Cypher query helpers, and traversal orchestration in `retrieval/` or a small shared graph module. Do not bury database concerns inside the ingestion parsers.
+
+### 5.3 Architecture Flow
 
 ```text
 Incident JSON + runbooks
@@ -215,7 +252,7 @@ Incident JSON + runbooks
   -> FastAPI + Chainlit response
 ```
 
-### 5.3 Query Flow
+### 5.4 Query Flow
 
 ```text
 User question
