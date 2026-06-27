@@ -24,7 +24,6 @@ The output must show:
 - hypotheses considered
 - hypotheses supported or ruled out
 - citations to graph nodes
-- confidence rationale
 - recommended actions when supported by runbooks or evidence
 
 ### 1.3 Core Thesis
@@ -141,7 +140,7 @@ Each incident contains:
 - Hard incidents include `services.json` topology with service aliases and dependencies.
 - Deployment records include explicit `commit_ids` arrays for deterministic commit-to-deployment edges.
 - Metric series include explicit `service` ownership for deterministic metric-to-service edges.
-- All current `expected_rca.json` files have `confidence: high`, so medium/low confidence behavior needs simulated missing-evidence tests or future lightweight fixtures.
+- All current `expected_rca.json` files have `confidence: high`. Confidence scoring is deferred to a future phase and is not part of the initial implementation scope.
 
 ## 4. Graph Model
 
@@ -348,8 +347,6 @@ Response:
 ```json
 {
   "answer": "...",
-  "confidence": "high",
-  "confidence_rationale": "...",
   "traversal_path": [],
   "evidence_nodes": [],
   "hypotheses": {
@@ -386,7 +383,6 @@ The UI should show four visible investigation steps:
 4. **RCA generation**
    - final answer
    - evidence trail
-   - confidence rationale
    - recommended actions when supported
 
 The UI should optimize for clarity of investigation, not visual polish.
@@ -425,9 +421,9 @@ Every citation should reference a graph node that exists and accurately supports
 
 The answer should use `metadata.primary_hypotheses` as candidates and show which are supported or ruled out.
 
-**Confidence calibration**
+**Confidence scoring**
 
-The answer should reduce confidence when graph traversal misses key source categories. The current dataset only contains high-confidence ground truth, so evaluation should include missing-evidence simulations for low/medium confidence behavior.
+Deferred to a future phase. The initial implementation does not need calibrated `high | medium | low` confidence outputs.
 
 ### 10.3 Initial Targets
 
@@ -538,6 +534,7 @@ This field must remain evaluation-only.
 - Run all 12 benchmark incidents.
 - Report evidence recall, citation validity, and hypothesis handling.
 - Document known limitations.
+- Leave confidence scoring out of the initial benchmark report.
 
 ## 13. Risk Register
 
@@ -547,7 +544,7 @@ This field must remain evaluation-only.
 | Commit-to-deployment mapping is ambiguous | Medium | Label as incident-window association unless `commit_ids` are added |
 | LLM extraction produces malformed JSON | Medium | Validate schema, retry, and continue with deterministic graph |
 | Local llama.cpp is slow | Medium | Use compact context, cache repeated queries, keep model small |
-| Confidence evaluation is weak | Medium | Simulate missing evidence because current expected labels are all high |
+| Confidence scoring is deferred | Low | Exclude it from initial implementation and benchmark reporting |
 | Overbuilding the architecture | Medium | Prioritize graph correctness, citations, and hypothesis elimination over polish |
 
 ## 14. Definition of Done
@@ -563,3 +560,4 @@ The assessment is successful when:
 - hypotheses are visibly supported or ruled out
 - evaluation can score against benchmark files
 - the local demo runs on M1 hardware within practical time limits
+- confidence scoring is explicitly deferred and not required for initial completion

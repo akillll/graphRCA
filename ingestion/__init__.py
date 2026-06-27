@@ -17,6 +17,7 @@ from ingestion.common.ids import (
     slugify,
     timeline_event_id,
 )
+from ingestion.normalization import normalize_result, normalize_results
 from ingestion.provenance import Provenance, llm_provenance, rule_provenance
 from ingestion.types import (
     EDGE_REQUIRED_FIELDS,
@@ -49,6 +50,8 @@ __all__ = [
     "log_pattern_id",
     "metric_id",
     "metric_series_id",
+    "normalize_result",
+    "normalize_results",
     "rule_provenance",
     "runbook_id",
     "service_id",

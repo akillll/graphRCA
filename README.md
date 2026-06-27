@@ -1,0 +1,1 @@
+The benchmark dataset is intentionally stored as normalized evidence files rather than a pre-linked graph. The ingestion pipeline is responsible for reconstructing the operational evidence graph, mirroring how production systems ingest data from heterogeneous sources such as monitoring platforms, CI/CD systems, and version control.
