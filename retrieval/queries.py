@@ -249,6 +249,32 @@ DEPLOYMENTS_FOR_INCIDENT_QUERY = """
 MATCH (incident:Incident {id: $incident_id})<-[observed_in:OBSERVED_IN]-(deployment:Deployment)
 OPTIONAL MATCH (deployment)-[observed_on:OBSERVED_ON]->(service:Service)
 OPTIONAL MATCH (commit:Commit)-[included_in:INCLUDED_IN]->(deployment)
+WITH
+  incident,
+  observed_in,
+  deployment,
+  observed_on,
+  service,
+  collect(DISTINCT CASE WHEN commit IS NULL THEN NULL ELSE {
+    node_id: commit.id,
+    node_labels: labels(commit),
+    properties: properties(commit)
+  } END) AS included_commit_items,
+  collect(DISTINCT CASE WHEN included_in IS NULL THEN NULL ELSE {
+    relationship_type: type(included_in),
+    source_id: startNode(included_in).id,
+    target_id: endNode(included_in).id,
+    properties: properties(included_in)
+  } END) AS included_in_edge_items
+ORDER BY deployment.timestamp ASC, deployment.id ASC
+WITH
+  incident,
+  observed_in,
+  deployment,
+  observed_on,
+  service,
+  [item IN included_commit_items WHERE item IS NOT NULL] AS included_commits,
+  [item IN included_in_edge_items WHERE item IS NOT NULL] AS included_in_edges
 RETURN {
   incident_id: incident.id,
   deployment: {
@@ -279,19 +305,9 @@ RETURN {
       properties: properties(observed_on)
     }
   END,
-  included_commits: [item IN collect(DISTINCT CASE WHEN commit IS NULL THEN NULL ELSE {
-    node_id: commit.id,
-    node_labels: labels(commit),
-    properties: properties(commit)
-  } END) WHERE item IS NOT NULL],
-  included_in_edges: [item IN collect(DISTINCT CASE WHEN included_in IS NULL THEN NULL ELSE {
-    relationship_type: type(included_in),
-    source_id: startNode(included_in).id,
-    target_id: endNode(included_in).id,
-    properties: properties(included_in)
-  } END) WHERE item IS NOT NULL]
+  included_commits: included_commits,
+  included_in_edges: included_in_edges
 } AS result
-ORDER BY deployment.timestamp ASC, deployment.id ASC
 """.strip()
 """Retrieve deployment evidence attached to one incident."""
 
@@ -300,6 +316,41 @@ COMMITS_FOR_INCIDENT_QUERY = """
 MATCH (incident:Incident {id: $incident_id})<-[observed_in:OBSERVED_IN]-(commit:Commit)
 OPTIONAL MATCH (commit)-[changed_rel:CHANGED]->(configuration:Configuration)
 OPTIONAL MATCH (commit)-[included_in:INCLUDED_IN]->(deployment:Deployment)
+WITH
+  incident,
+  observed_in,
+  commit,
+  collect(DISTINCT CASE WHEN configuration IS NULL THEN NULL ELSE {
+    node_id: configuration.id,
+    node_labels: labels(configuration),
+    properties: properties(configuration)
+  } END) AS changed_configurations,
+  collect(DISTINCT CASE WHEN changed_rel IS NULL THEN NULL ELSE {
+    relationship_type: type(changed_rel),
+    source_id: startNode(changed_rel).id,
+    target_id: endNode(changed_rel).id,
+    properties: properties(changed_rel)
+  } END) AS changed_edges,
+  collect(DISTINCT CASE WHEN deployment IS NULL THEN NULL ELSE {
+    node_id: deployment.id,
+    node_labels: labels(deployment),
+    properties: properties(deployment)
+  } END) AS deployments,
+  collect(DISTINCT CASE WHEN included_in IS NULL THEN NULL ELSE {
+    relationship_type: type(included_in),
+    source_id: startNode(included_in).id,
+    target_id: endNode(included_in).id,
+    properties: properties(included_in)
+  } END) AS included_in_edges
+ORDER BY commit.timestamp ASC, commit.id ASC
+WITH
+  incident,
+  observed_in,
+  commit,
+  [item IN changed_configurations WHERE item IS NOT NULL] AS changed_configurations,
+  [item IN changed_edges WHERE item IS NOT NULL] AS changed_edges,
+  [item IN deployments WHERE item IS NOT NULL] AS deployments,
+  [item IN included_in_edges WHERE item IS NOT NULL] AS included_in_edges
 RETURN {
   incident_id: incident.id,
   commit: {
@@ -313,30 +364,11 @@ RETURN {
     target_id: endNode(observed_in).id,
     properties: properties(observed_in)
   },
-  changed_configurations: [item IN collect(DISTINCT CASE WHEN configuration IS NULL THEN NULL ELSE {
-    node_id: configuration.id,
-    node_labels: labels(configuration),
-    properties: properties(configuration)
-  } END) WHERE item IS NOT NULL],
-  changed_edges: [item IN collect(DISTINCT CASE WHEN changed_rel IS NULL THEN NULL ELSE {
-    relationship_type: type(changed_rel),
-    source_id: startNode(changed_rel).id,
-    target_id: endNode(changed_rel).id,
-    properties: properties(changed_rel)
-  } END) WHERE item IS NOT NULL],
-  deployments: [item IN collect(DISTINCT CASE WHEN deployment IS NULL THEN NULL ELSE {
-    node_id: deployment.id,
-    node_labels: labels(deployment),
-    properties: properties(deployment)
-  } END) WHERE item IS NOT NULL],
-  included_in_edges: [item IN collect(DISTINCT CASE WHEN included_in IS NULL THEN NULL ELSE {
-    relationship_type: type(included_in),
-    source_id: startNode(included_in).id,
-    target_id: endNode(included_in).id,
-    properties: properties(included_in)
-  } END) WHERE item IS NOT NULL]
+  changed_configurations: changed_configurations,
+  changed_edges: changed_edges,
+  deployments: deployments,
+  included_in_edges: included_in_edges
 } AS result
-ORDER BY commit.timestamp ASC, commit.id ASC
 """.strip()
 """Retrieve commit evidence attached to one incident."""
 
@@ -402,6 +434,32 @@ LOGS_FOR_INCIDENT_QUERY = """
 MATCH (incident:Incident {id: $incident_id})<-[observed_in:OBSERVED_IN]-(log:LogEvent)
 OPTIONAL MATCH (log)-[observed_on:OBSERVED_ON]->(service:Service)
 OPTIONAL MATCH (log)-[log_ref:REFERENCES]->(referenced)
+WITH
+  incident,
+  observed_in,
+  log,
+  service,
+  observed_on,
+  collect(DISTINCT CASE WHEN referenced IS NULL THEN NULL ELSE {
+    node_id: referenced.id,
+    node_labels: labels(referenced),
+    properties: properties(referenced)
+  } END) AS references,
+  collect(DISTINCT CASE WHEN log_ref IS NULL THEN NULL ELSE {
+    relationship_type: type(log_ref),
+    source_id: startNode(log_ref).id,
+    target_id: endNode(log_ref).id,
+    properties: properties(log_ref)
+  } END) AS reference_edges
+ORDER BY log.timestamp ASC, log.id ASC
+WITH
+  incident,
+  observed_in,
+  log,
+  service,
+  observed_on,
+  [item IN references WHERE item IS NOT NULL] AS references,
+  [item IN reference_edges WHERE item IS NOT NULL] AS reference_edges
 RETURN {
   incident_id: incident.id,
   log: {
@@ -432,19 +490,9 @@ RETURN {
       properties: properties(observed_on)
     }
   END,
-  references: [item IN collect(DISTINCT CASE WHEN referenced IS NULL THEN NULL ELSE {
-    node_id: referenced.id,
-    node_labels: labels(referenced),
-    properties: properties(referenced)
-  } END) WHERE item IS NOT NULL],
-  reference_edges: [item IN collect(DISTINCT CASE WHEN log_ref IS NULL THEN NULL ELSE {
-    relationship_type: type(log_ref),
-    source_id: startNode(log_ref).id,
-    target_id: endNode(log_ref).id,
-    properties: properties(log_ref)
-  } END) WHERE item IS NOT NULL]
+  references: references,
+  reference_edges: reference_edges
 } AS result
-ORDER BY log.timestamp ASC, log.id ASC
 """.strip()
 """Retrieve log evidence attached to one incident."""
 
@@ -453,6 +501,32 @@ TIMELINE_EVENTS_FOR_INCIDENT_QUERY = """
 MATCH (incident:Incident {id: $incident_id})<-[observed_in:OBSERVED_IN]-(timeline:TimelineEvent)
 OPTIONAL MATCH (timeline)-[occurred_after:OCCURRED_AFTER]->(previous:TimelineEvent)
 OPTIONAL MATCH (timeline)-[timeline_ref:REFERENCES]->(referenced)
+WITH
+  incident,
+  observed_in,
+  timeline,
+  previous,
+  occurred_after,
+  collect(DISTINCT CASE WHEN referenced IS NULL THEN NULL ELSE {
+    node_id: referenced.id,
+    node_labels: labels(referenced),
+    properties: properties(referenced)
+  } END) AS references,
+  collect(DISTINCT CASE WHEN timeline_ref IS NULL THEN NULL ELSE {
+    relationship_type: type(timeline_ref),
+    source_id: startNode(timeline_ref).id,
+    target_id: endNode(timeline_ref).id,
+    properties: properties(timeline_ref)
+  } END) AS reference_edges
+ORDER BY timeline.timestamp ASC, timeline.id ASC
+WITH
+  incident,
+  observed_in,
+  timeline,
+  previous,
+  occurred_after,
+  [item IN references WHERE item IS NOT NULL] AS references,
+  [item IN reference_edges WHERE item IS NOT NULL] AS reference_edges
 RETURN {
   incident_id: incident.id,
   timeline_event: {
@@ -483,19 +557,9 @@ RETURN {
       properties: properties(occurred_after)
     }
   END,
-  references: [item IN collect(DISTINCT CASE WHEN referenced IS NULL THEN NULL ELSE {
-    node_id: referenced.id,
-    node_labels: labels(referenced),
-    properties: properties(referenced)
-  } END) WHERE item IS NOT NULL],
-  reference_edges: [item IN collect(DISTINCT CASE WHEN timeline_ref IS NULL THEN NULL ELSE {
-    relationship_type: type(timeline_ref),
-    source_id: startNode(timeline_ref).id,
-    target_id: endNode(timeline_ref).id,
-    properties: properties(timeline_ref)
-  } END) WHERE item IS NOT NULL]
+  references: references,
+  reference_edges: reference_edges
 } AS result
-ORDER BY timeline.timestamp ASC, timeline.id ASC
 """.strip()
 """Retrieve timeline evidence attached to one incident."""
 
@@ -504,6 +568,41 @@ HYPOTHESES_FOR_INCIDENT_QUERY = """
 MATCH (hypothesis:Hypothesis)-[observed_in:OBSERVED_IN]->(incident:Incident {id: $incident_id})
 OPTIONAL MATCH (supporting_evidence)-[supports:SUPPORTS]->(hypothesis)
 OPTIONAL MATCH (counter_evidence)-[rules_out:RULES_OUT]->(hypothesis)
+WITH
+  incident,
+  hypothesis,
+  observed_in,
+  collect(DISTINCT CASE WHEN supporting_evidence IS NULL THEN NULL ELSE {
+    node_id: supporting_evidence.id,
+    node_labels: labels(supporting_evidence),
+    properties: properties(supporting_evidence)
+  } END) AS supporting_evidence,
+  collect(DISTINCT CASE WHEN supports IS NULL THEN NULL ELSE {
+    relationship_type: type(supports),
+    source_id: startNode(supports).id,
+    target_id: endNode(supports).id,
+    properties: properties(supports)
+  } END) AS support_edges,
+  collect(DISTINCT CASE WHEN counter_evidence IS NULL THEN NULL ELSE {
+    node_id: counter_evidence.id,
+    node_labels: labels(counter_evidence),
+    properties: properties(counter_evidence)
+  } END) AS ruling_out_evidence,
+  collect(DISTINCT CASE WHEN rules_out IS NULL THEN NULL ELSE {
+    relationship_type: type(rules_out),
+    source_id: startNode(rules_out).id,
+    target_id: endNode(rules_out).id,
+    properties: properties(rules_out)
+  } END) AS rules_out_edges
+ORDER BY hypothesis.id ASC
+WITH
+  incident,
+  hypothesis,
+  observed_in,
+  [item IN supporting_evidence WHERE item IS NOT NULL] AS supporting_evidence,
+  [item IN support_edges WHERE item IS NOT NULL] AS support_edges,
+  [item IN ruling_out_evidence WHERE item IS NOT NULL] AS ruling_out_evidence,
+  [item IN rules_out_edges WHERE item IS NOT NULL] AS rules_out_edges
 RETURN {
   incident_id: incident.id,
   hypothesis: {
@@ -517,30 +616,11 @@ RETURN {
     target_id: endNode(observed_in).id,
     properties: properties(observed_in)
   },
-  supporting_evidence: [item IN collect(DISTINCT CASE WHEN supporting_evidence IS NULL THEN NULL ELSE {
-    node_id: supporting_evidence.id,
-    node_labels: labels(supporting_evidence),
-    properties: properties(supporting_evidence)
-  } END) WHERE item IS NOT NULL],
-  support_edges: [item IN collect(DISTINCT CASE WHEN supports IS NULL THEN NULL ELSE {
-    relationship_type: type(supports),
-    source_id: startNode(supports).id,
-    target_id: endNode(supports).id,
-    properties: properties(supports)
-  } END) WHERE item IS NOT NULL],
-  ruling_out_evidence: [item IN collect(DISTINCT CASE WHEN counter_evidence IS NULL THEN NULL ELSE {
-    node_id: counter_evidence.id,
-    node_labels: labels(counter_evidence),
-    properties: properties(counter_evidence)
-  } END) WHERE item IS NOT NULL],
-  rules_out_edges: [item IN collect(DISTINCT CASE WHEN rules_out IS NULL THEN NULL ELSE {
-    relationship_type: type(rules_out),
-    source_id: startNode(rules_out).id,
-    target_id: endNode(rules_out).id,
-    properties: properties(rules_out)
-  } END) WHERE item IS NOT NULL]
+  supporting_evidence: supporting_evidence,
+  support_edges: support_edges,
+  ruling_out_evidence: ruling_out_evidence,
+  rules_out_edges: rules_out_edges
 } AS result
-ORDER BY hypothesis.id ASC
 """.strip()
 """Retrieve candidate hypotheses and attached support or rule-out signals."""
 
@@ -548,6 +628,28 @@ ORDER BY hypothesis.id ASC
 RUNBOOKS_FOR_INCIDENT_QUERY = """
 MATCH (incident:Incident {id: $incident_id})-[matched_by:MATCHES]->(runbook:Runbook)
 OPTIONAL MATCH (runbook)-[recommends:RECOMMENDS]->(action:Action)
+WITH
+  incident,
+  runbook,
+  matched_by,
+  collect(DISTINCT CASE WHEN action IS NULL THEN NULL ELSE {
+    node_id: action.id,
+    node_labels: labels(action),
+    properties: properties(action)
+  } END) AS recommended_actions,
+  collect(DISTINCT CASE WHEN recommends IS NULL THEN NULL ELSE {
+    relationship_type: type(recommends),
+    source_id: startNode(recommends).id,
+    target_id: endNode(recommends).id,
+    properties: properties(recommends)
+  } END) AS recommendation_edges
+ORDER BY runbook.filename ASC, runbook.id ASC
+WITH
+  incident,
+  runbook,
+  matched_by,
+  [item IN recommended_actions WHERE item IS NOT NULL] AS recommended_actions,
+  [item IN recommendation_edges WHERE item IS NOT NULL] AS recommendation_edges
 RETURN {
   incident_id: incident.id,
   runbook: {
@@ -561,19 +663,9 @@ RETURN {
     target_id: endNode(matched_by).id,
     properties: properties(matched_by)
   },
-  recommended_actions: [item IN collect(DISTINCT CASE WHEN action IS NULL THEN NULL ELSE {
-    node_id: action.id,
-    node_labels: labels(action),
-    properties: properties(action)
-  } END) WHERE item IS NOT NULL],
-  recommendation_edges: [item IN collect(DISTINCT CASE WHEN recommends IS NULL THEN NULL ELSE {
-    relationship_type: type(recommends),
-    source_id: startNode(recommends).id,
-    target_id: endNode(recommends).id,
-    properties: properties(recommends)
-  } END) WHERE item IS NOT NULL]
+  recommended_actions: recommended_actions,
+  recommendation_edges: recommendation_edges
 } AS result
-ORDER BY runbook.filename ASC, runbook.id ASC
 """.strip()
 """Retrieve runbooks matched to one incident and their recommended actions."""
 
