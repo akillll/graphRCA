@@ -4,11 +4,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
-import re
+from pathlib import Path
 from typing import Any
 
 from ingestion.common.ids import incident_id as canonical_incident_id
 from retrieval.client import Neo4jReadClient
+from retrieval.incident_index import IncidentSemanticProfile, build_incident_semantic_index
+from retrieval.query_normalization import overlap_terms, singularize_token, tokenize_text
 from retrieval.queries import (
     ALL_INCIDENTS_QUERY,
     INCIDENT_BY_ID_QUERY,
@@ -36,27 +38,36 @@ class _CandidateState:
 
 
 class IncidentResolver:
-    """Resolve extracted entities into ranked incident candidates using Neo4j lookups."""
+    """Resolve extracted entities into ranked incident candidates using graph and semantic fixture hints."""
 
-    def __init__(self, client: Neo4jReadClient) -> None:
-        """Initialize the resolver with a read-only Neo4j client."""
+    def __init__(
+        self,
+        client: Neo4jReadClient,
+        *,
+        incident_index: dict[str, IncidentSemanticProfile] | None = None,
+    ) -> None:
+        """Initialize the resolver with a read-only Neo4j client and optional semantic index."""
         self._client = client
+        self._incident_index = incident_index or {}
 
     @classmethod
-    def from_env(cls, env_path: str = ".env") -> "IncidentResolver":
-        """Build a resolver from `.env`-backed Neo4j settings."""
-        return cls(Neo4jReadClient.from_env(env_path))
+    def from_env(cls, env_path: str = ".env", *, data_dir: str | Path | None = None) -> "IncidentResolver":
+        """Build a resolver from `.env`-backed Neo4j settings and optional local incident profiles."""
+        incident_index = build_incident_semantic_index(data_dir) if data_dir is not None else None
+        return cls(Neo4jReadClient.from_env(env_path), incident_index=incident_index)
 
     def resolve(self, entities: ExtractedEntities) -> list[IncidentCandidate]:
         """Return ranked candidate incidents without traversing the full evidence graph."""
         candidates: dict[str, _CandidateState] = {}
+        incident_payloads = self._all_incident_payloads()
 
         self._add_incident_id_matches(candidates, entities)
         self._add_service_name_matches(candidates, entities)
         self._add_service_alias_matches(candidates, entities)
-        self._add_broad_incident_matches(candidates, entities)
+        self._add_semantic_profile_matches(candidates, entities, incident_payloads)
+        self._add_broad_incident_matches(candidates, entities, incident_payloads)
         self._apply_time_hint_adjustments(candidates, entities.time_references)
-        self._apply_symptom_adjustments(candidates, entities.symptoms)
+        self._apply_signal_quality_adjustments(candidates, entities)
 
         ranked = sorted(
             candidates.values(),
@@ -76,6 +87,19 @@ class IncidentResolver:
         """Allow the resolver to be used as a small callable helper."""
         return self.resolve(entities)
 
+    def _all_incident_payloads(self) -> dict[str, dict[str, Any]]:
+        """Load one compact payload per incident for broad resolution scoring."""
+        payloads: dict[str, dict[str, Any]] = {}
+        rows = self._client.run_query(ALL_INCIDENTS_QUERY)
+        for row in rows:
+            payload = row.get("result", {})
+            incident = payload.get("incident") or {}
+            node_id = str(incident.get("node_id", "")).strip()
+            if not node_id:
+                continue
+            payloads[node_id] = incident
+        return payloads
+
     def _add_incident_id_matches(
         self,
         candidates: dict[str, _CandidateState],
@@ -91,7 +115,7 @@ class IncidentResolver:
                 payload = row.get("result", {})
                 incident = payload.get("incident") or {}
                 state = self._candidate_state(candidates, incident)
-                state.add(1.0, f"exact incident ID match: {incident_id}")
+                state.add(1.2, f"exact incident ID match: {incident_id}")
 
     def _add_service_name_matches(
         self,
@@ -109,7 +133,7 @@ class IncidentResolver:
                 payload = row.get("result", {})
                 incident = payload.get("incident") or {}
                 state = self._candidate_state(candidates, incident)
-                state.add(0.7, f"primary service match: {service_name}")
+                state.add(0.8, f"primary service match: {service_name}")
 
     def _add_service_alias_matches(
         self,
@@ -135,7 +159,82 @@ class IncidentResolver:
                     incident_payload = incident_row.get("result", {})
                     incident = incident_payload.get("incident") or {}
                     state = self._candidate_state(candidates, incident)
-                    state.add(0.45, f"service alias match: {service_alias} -> {canonical_name}")
+                    state.add(0.55, f"service alias match: {service_alias} -> {canonical_name}")
+
+    def _add_semantic_profile_matches(
+        self,
+        candidates: dict[str, _CandidateState],
+        entities: ExtractedEntities,
+        incident_payloads: dict[str, dict[str, Any]],
+    ) -> None:
+        """Add semantic boosts using deterministic incident profiles from runtime-safe fixtures."""
+        if not self._incident_index:
+            return
+
+        for incident_id, profile in self._incident_index.items():
+            incident_payload = incident_payloads.get(incident_id)
+            if incident_payload is None:
+                incident_payload = {
+                    "node_id": incident_id,
+                    "properties": {
+                        "id": incident_id,
+                        "title": profile.title,
+                        "summary": profile.summary,
+                        "service": profile.primary_service,
+                        "tags": profile.tags,
+                    },
+                }
+            state = self._candidate_state(candidates, incident_payload)
+
+            semantic_overlap = overlap_terms(entities.semantic_terms, profile.semantic_terms)
+            if semantic_overlap:
+                score = min(0.45, 0.06 * len(semantic_overlap))
+                state.add(score, f"semantic overlap: {', '.join(semantic_overlap[:4])}")
+
+            symptom_overlap = overlap_terms(entities.symptom_mentions, profile.semantic_terms)
+            if symptom_overlap:
+                score = min(0.35, 0.12 * len(symptom_overlap))
+                state.add(score, f"symptom overlap: {', '.join(symptom_overlap[:3])}")
+
+            operational_overlap = overlap_terms(entities.operational_terms, profile.semantic_terms)
+            if operational_overlap:
+                score = min(0.35, 0.14 * len(operational_overlap))
+                state.add(score, f"operational overlap: {', '.join(operational_overlap[:3])}")
+
+            service_family_overlap = overlap_terms(
+                entities.semantic_terms,
+                tokenize_text(" ".join([*profile.service_names, *profile.alias_names]), min_length=2),
+            )
+            if service_family_overlap and not entities.services:
+                score = min(0.25, 0.08 * len(service_family_overlap))
+                state.add(score, f"service-family overlap: {', '.join(service_family_overlap[:3])}")
+
+    def _add_broad_incident_matches(
+        self,
+        candidates: dict[str, _CandidateState],
+        entities: ExtractedEntities,
+        incident_payloads: dict[str, dict[str, Any]],
+    ) -> None:
+        """Seed candidates from broad incident metadata when exact service matching is absent."""
+        question_tokens = entities.semantic_terms or _question_tokens(entities.raw_question)
+        if not question_tokens and not entities.time_references and not entities.symptoms:
+            return
+
+        for incident in incident_payloads.values():
+            state = self._candidate_state(candidates, incident)
+            searchable = _incident_searchable_text(state.properties)
+            matched_tokens = [
+                token
+                for token in question_tokens
+                if len(token) >= 4 and (token in searchable or singularize_token(token) in searchable)
+            ]
+            for token in matched_tokens[:5]:
+                state.add(0.08, f"incident text match: {token}")
+
+            if entities.symptoms:
+                matched_symptoms = [symptom for symptom in entities.symptoms if symptom.lower() in searchable]
+                for symptom in matched_symptoms:
+                    state.add(0.12, f"incident symptom text match: {symptom}")
 
     def _apply_time_hint_adjustments(
         self,
@@ -156,67 +255,26 @@ class IncidentResolver:
                 if "time hints did not match incident window" not in candidate.reasons:
                     candidate.reasons.append("time hints did not match incident window")
 
-    def _apply_symptom_adjustments(
-        self,
-        candidates: dict[str, _CandidateState],
-        symptoms: list[str],
-    ) -> None:
-        """Apply a small boost when symptom phrases appear in incident title or summary."""
-        if not symptoms:
-            return
-
-        for candidate in candidates.values():
-            searchable = " ".join(
-                str(candidate.properties.get(field, ""))
-                for field in ("title", "summary", "id")
-            ).lower()
-            matched_symptoms = [symptom for symptom in symptoms if symptom.lower() in searchable]
-            if not matched_symptoms:
-                continue
-            for symptom in matched_symptoms:
-                candidate.add(0.15, f"symptom phrase match: {symptom}")
-
-    def _add_broad_incident_matches(
+    def _apply_signal_quality_adjustments(
         self,
         candidates: dict[str, _CandidateState],
         entities: ExtractedEntities,
     ) -> None:
-        """Seed candidates from broad incident metadata when exact service matching is absent."""
-        question_tokens = _question_tokens(entities.raw_question)
-        if not question_tokens and not entities.time_references and not entities.symptoms:
-            return
+        """Nudge candidates based on overall signal quality and contradictory gaps."""
+        for candidate in candidates.values():
+            reasons_text = " ".join(candidate.reasons).lower()
+            has_exact_signal = "exact incident id match" in reasons_text or "primary service match" in reasons_text
+            has_semantic_signal = any(
+                phrase in reasons_text
+                for phrase in ("semantic overlap", "symptom overlap", "operational overlap", "service-family overlap")
+            )
 
-        rows = self._client.run_query(ALL_INCIDENTS_QUERY)
-        for row in rows:
-            payload = row.get("result", {})
-            incident = payload.get("incident") or {}
-            state = self._candidate_state(candidates, incident)
-            searchable = _incident_searchable_text(state.properties)
-            matched_tokens = [
-                token
-                for token in question_tokens
-                if len(token) >= 4 and (token in searchable or _singularize_token(token) in searchable)
-            ]
-            for token in matched_tokens[:4]:
-                state.add(0.12, f"incident text match: {token}")
-
-            if entities.time_references:
-                matched_hints = [
-                    hint
-                    for hint in entities.time_references
-                    if _incident_matches_time_hint(state.properties, hint)
-                ]
-                for hint in matched_hints:
-                    state.add(0.28, f"time hint match: {hint}")
-
-            if entities.symptoms:
-                matched_symptoms = [
-                    symptom
-                    for symptom in entities.symptoms
-                    if symptom.lower() in searchable
-                ]
-                for symptom in matched_symptoms:
-                    state.add(0.12, f"incident symptom text match: {symptom}")
+            if has_exact_signal and has_semantic_signal:
+                candidate.add(0.1, "exact and semantic signals agree")
+            elif not has_exact_signal and has_semantic_signal and entities.services:
+                candidate.score = max(0.0, candidate.score - 0.05)
+                if "no exact service alignment" not in candidate.reasons:
+                    candidate.reasons.append("no exact service alignment")
 
     @staticmethod
     def _candidate_state(
@@ -396,42 +454,9 @@ def _parse_month_day_hint(value: str) -> dict[str, int | str] | None:
     return {"kind": "month_day", "month": month, "day": day}
 
 
-_TOKEN_RE = re.compile(r"[a-z0-9]+")
-_STOPWORDS = {
-    "what",
-    "caused",
-    "cause",
-    "why",
-    "did",
-    "the",
-    "on",
-    "in",
-    "of",
-    "to",
-    "a",
-    "an",
-    "and",
-    "for",
-    "this",
-    "that",
-    "slow",
-    "down",
-}
-
-
 def _question_tokens(question: str) -> list[str]:
     """Return stable searchable tokens from the raw user question."""
-    tokens: list[str] = []
-    seen: set[str] = set()
-    for token in _TOKEN_RE.findall(question.lower()):
-        if len(token) < 3 or token in _STOPWORDS:
-            continue
-        normalized = _singularize_token(token)
-        if normalized in seen:
-            continue
-        seen.add(normalized)
-        tokens.append(normalized)
-    return tokens
+    return tokenize_text(question)
 
 
 def _incident_searchable_text(properties: dict[str, Any]) -> str:
@@ -445,12 +470,3 @@ def _incident_searchable_text(properties: dict[str, Any]) -> str:
     if isinstance(tags, list):
         parts.extend(str(item).strip().lower() for item in tags if str(item).strip())
     return " | ".join(parts)
-
-
-def _singularize_token(token: str) -> str:
-    """Return a lightweight singularized token for fuzzy lexical matching."""
-    if token.endswith("ies") and len(token) > 4:
-        return token[:-3] + "y"
-    if token.endswith("s") and not token.endswith("ss") and len(token) > 4:
-        return token[:-1]
-    return token

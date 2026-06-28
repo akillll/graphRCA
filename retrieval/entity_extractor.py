@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
+from retrieval.query_normalization import expand_terms, normalize_text, tokenize_text
 from retrieval.types import ExtractedEntities
 
 
@@ -42,6 +43,17 @@ _SYMPTOM_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("regression", re.compile(r"\bregression\b", re.IGNORECASE)),
 )
 
+_OPERATIONAL_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("recent deploy", re.compile(r"\b(?:after|following)\s+(?:the\s+)?(?:deploy|deployment|rollout)\b", re.IGNORECASE)),
+    ("rollback", re.compile(r"\brollback\b", re.IGNORECASE)),
+    ("tenant migration", re.compile(r"\btenant migration\b", re.IGNORECASE)),
+    ("partial outage", re.compile(r"\bpartial (?:outage|degradation|failure)\b", re.IGNORECASE)),
+    ("new purchase", re.compile(r"\b(?:newly purchased|recently updated|new purchase)\b", re.IGNORECASE)),
+    ("batch job", re.compile(r"\b(?:batch job|backfill|reconciliation)\b", re.IGNORECASE)),
+    ("traffic increase", re.compile(r"\b(?:traffic surge|increased traffic|campaign)\b", re.IGNORECASE)),
+    ("worker restart", re.compile(r"\b(?:restart|oomkilled|oom killed)\b", re.IGNORECASE)),
+)
+
 
 @dataclass(slots=True)
 class EntityExtractor:
@@ -60,17 +72,30 @@ class EntityExtractor:
         service_candidates = known_services if known_services is not None else self.known_services
         incident_candidates = known_incident_ids if known_incident_ids is not None else self.known_incident_ids
 
+        normalized_question = normalize_text(question)
         incident_ids = self._extract_incident_ids(question, incident_candidates)
         services = self._extract_services(question, service_candidates)
         symptoms = self._extract_symptoms(question)
         time_references = self._extract_time_references(question)
+        operational_terms = self._extract_operational_terms(question)
+        semantic_terms = self._extract_semantic_terms(
+            question=question,
+            services=services,
+            symptoms=symptoms,
+            operational_terms=operational_terms,
+        )
 
         return ExtractedEntities(
             raw_question=question,
+            normalized_question=normalized_question,
             incident_ids=incident_ids,
             services=services,
             symptoms=symptoms,
             time_references=time_references,
+            service_mentions=list(services),
+            symptom_mentions=list(symptoms),
+            operational_terms=operational_terms,
+            semantic_terms=semantic_terms,
         )
 
     def __call__(
@@ -132,6 +157,33 @@ class EntityExtractor:
                 matches.append(value)
 
         return _dedupe_preserve_order(matches)
+
+    @staticmethod
+    def _extract_operational_terms(question: str) -> list[str]:
+        """Return deterministic operational-context hints present in the question."""
+        matches: list[str] = []
+        for label, pattern in _OPERATIONAL_PATTERNS:
+            if pattern.search(question):
+                matches.append(label)
+        return _dedupe_preserve_order(matches)
+
+    @staticmethod
+    def _extract_semantic_terms(
+        *,
+        question: str,
+        services: list[str],
+        symptoms: list[str],
+        operational_terms: list[str],
+    ) -> list[str]:
+        """Return normalized query terms plus deterministic domain expansions."""
+        base_terms = tokenize_text(question)
+        for service in services:
+            base_terms.extend(tokenize_text(service, min_length=2))
+        for symptom in symptoms:
+            base_terms.extend(tokenize_text(symptom))
+        for term in operational_terms:
+            base_terms.extend(tokenize_text(term))
+        return _dedupe_preserve_order(expand_terms(base_terms))
 
 
 def _drop_subsumed_symptoms(symptoms: list[str]) -> list[str]:

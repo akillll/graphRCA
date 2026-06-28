@@ -134,7 +134,7 @@ def _retrieve_evidence_bundle(question: str, *, env_path: str, data_dir: Path) -
         known_services=known_services,
         known_incident_ids=known_incident_ids,
     )
-    resolver = IncidentResolver.from_env(env_path)
+    resolver = IncidentResolver.from_env(env_path, data_dir=data_dir)
     traversal = IncidentTraversal.from_env(env_path)
     assembler = EvidenceAssembler()
 

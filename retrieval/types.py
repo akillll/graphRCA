@@ -21,10 +21,15 @@ class ExtractedEntities:
     """Deterministic entity hints parsed directly from a user question."""
 
     raw_question: str
+    normalized_question: str = ""
     incident_ids: list[str] = field(default_factory=list)
     services: list[str] = field(default_factory=list)
     symptoms: list[str] = field(default_factory=list)
     time_references: list[str] = field(default_factory=list)
+    service_mentions: list[str] = field(default_factory=list)
+    symptom_mentions: list[str] = field(default_factory=list)
+    operational_terms: list[str] = field(default_factory=list)
+    semantic_terms: list[str] = field(default_factory=list)
 
 
 @dataclass(slots=True)

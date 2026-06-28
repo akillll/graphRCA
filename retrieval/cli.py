@@ -35,7 +35,7 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     if args.command == "resolve-question":
-        resolver = IncidentResolver.from_env(args.env_path)
+        resolver = IncidentResolver.from_env(args.env_path, data_dir=Path(args.data_dir))
         return _resolve_question(args.question, extractor, resolver)
 
     if args.command == "traverse-incident":
@@ -43,7 +43,7 @@ def main(argv: list[str] | None = None) -> int:
         return _traverse_incident(args.incident_id, traversal)
 
     if args.command == "bundle-question":
-        resolver = IncidentResolver.from_env(args.env_path)
+        resolver = IncidentResolver.from_env(args.env_path, data_dir=Path(args.data_dir))
         traversal = IncidentTraversal.from_env(args.env_path)
         assembler = EvidenceAssembler()
         return _bundle_question(args.question, extractor, resolver, traversal, assembler, output_json=args.json)

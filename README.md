@@ -2,6 +2,33 @@
 
 Local GraphRAG-powered incident investigation system for evidence-backed root cause analysis.
 
+This repository is intentionally built as a benchmark-first assessment system, not a production incident platform. It uses a fixed synthetic incident dataset to demonstrate local GraphRAG, graph-centered retrieval, hypothesis evaluation, and evidence-backed RCA generation with `llama.cpp`.
+
+## What It Is
+
+- A local GraphRAG prototype for incident RCA
+- A benchmark-driven system built around 12 synthetic incident cases
+- An assessment submission showing graph ingestion, retrieval, local inference, and investigation UX
+
+## What It Is Not
+
+- Not a production-ready observability product
+- Not connected to live telemetry sources
+- Not yet a fully general evaluation or vector-retrieval platform
+
+## Current Capabilities
+
+- Deterministic ingestion of benchmark incidents into Neo4j, excluding `expected_rca.json`
+- Incident resolution using exact plus semantic query matching
+- Incident-centered graph traversal and evidence assembly
+- Hypothesis support/rule-out analysis with deterministic fallback scoring
+- FastAPI API and Chainlit UI over a local `llama.cpp` server
+
+## Current Limits
+
+- This project currently relies on graph-first retrieval plus lightweight semantic incident resolution, not full embedding-backed semantic search across all evidence.
+- Richer semantic retrieval is a future-scope improvement. During development, the target machine was a MacBook Air M1 running a local 1B-parameter model via `llama.cpp`, so the implementation favored deterministic graph retrieval and compact local reasoning over heavier retrieval infrastructure.
+
 ## Prerequisites
 
 - Python virtual environment
@@ -131,6 +158,16 @@ The UI should render:
 - Evidence Summary
 - Hypothesis Evaluation
 - Root Cause Analysis
+
+## Sample Questions
+
+These are good benchmark-style questions to try from the UI or API:
+
+- Why did catalog-api latency spike on April 21?
+- Why were newly purchased premium features denied on April 9 even though checkout was still succeeding?
+- What caused image processing backlog and worker restarts on May 22?
+- Why were notification delays limited to only some tenants on March 18?
+- What caused the distributed timeout chain in checkout on March 7?
 
 ## Troubleshooting
 

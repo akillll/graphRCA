@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import dataclass, field
-from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -31,6 +29,8 @@ from prompting.types import RcaCitation, RcaDraft
 from retrieval.assembly import EvidenceAssembler
 from retrieval.client import Neo4jReadClient
 from retrieval.entity_extractor import EntityExtractor
+from retrieval.hypothesis_scoring import build_evidence_summary, compose_root_cause, score_hypotheses
+from retrieval.incident_index import build_incident_semantic_index
 from retrieval.resolution import IncidentResolver
 from retrieval.traversal import IncidentTraversal
 from retrieval.types import EvidenceBundle, IncidentCandidate, TraversalResult
@@ -60,6 +60,7 @@ class InvestigationService:
             self.data_dir = Path(self.data_dir)
 
         known_services, known_incident_ids = _load_known_entities(self.data_dir)
+        incident_index = build_incident_semantic_index(self.data_dir)
 
         if self.graph_client is None:
             self.graph_client = Neo4jReadClient(
@@ -76,7 +77,7 @@ class InvestigationService:
             )
 
         if self.resolver is None:
-            self.resolver = IncidentResolver(self.graph_client)
+            self.resolver = IncidentResolver(self.graph_client, incident_index=incident_index)
 
         if self.traversal is None:
             self.traversal = IncidentTraversal(self.graph_client)
@@ -145,6 +146,8 @@ class InvestigationService:
                         "services": list(entities.services),
                         "symptoms": list(entities.symptoms),
                         "time_references": list(entities.time_references),
+                        "operational_terms": list(entities.operational_terms),
+                        "semantic_terms": list(entities.semantic_terms),
                     },
                 },
             )
@@ -284,7 +287,16 @@ def _response_hypotheses(evidence_bundle: EvidenceBundle, rca_draft: RcaDraft) -
     """Merge retrieved hypothesis records with RCA-draft support and rule-out outcomes."""
     supported = {item.strip().lower() for item in rca_draft.supported_hypotheses if item.strip()}
     ruled_out = {item.strip().lower() for item in rca_draft.ruled_out_hypotheses if item.strip()}
-    analysis_by_text = _analyze_hypotheses(evidence_bundle)
+    scoring_report = score_hypotheses(evidence_bundle)
+    analysis_by_text = {
+        item.normalized_text: {
+            "support_score": item.support_score,
+            "rule_out_score": item.rule_out_score,
+            "support_records": item.support_records,
+            "rule_out_records": item.rule_out_records,
+        }
+        for item in scoring_report.hypotheses
+    }
 
     hypotheses: list[dict[str, Any]] = []
     for record in evidence_bundle.hypotheses:
@@ -361,57 +373,29 @@ def _synthesize_evidence_backed_draft(evidence_bundle: EvidenceBundle) -> RcaDra
     if not incident_id:
         return None
 
-    analysis_by_text = _analyze_hypotheses(evidence_bundle)
-    if not analysis_by_text:
+    scoring_report = score_hypotheses(evidence_bundle)
+    if scoring_report.winning_hypothesis is None:
         return None
 
     runbooks = list(evidence_bundle.runbooks)
-    scored_hypotheses = sorted(
-        analysis_by_text.values(),
-        key=lambda item: (
-            item["support_score"] - item["rule_out_score"],
-            item["support_score"],
-            -item["rule_out_score"],
-            item["text"],
-        ),
-        reverse=True,
-    )
-    best = scored_hypotheses[0]
-    best_support = best["support_score"]
-    if best_support <= 0:
-        return None
-
-    best_text = str(best["text"]).strip()
-    support_records = list(best["support_records"])
+    best = scoring_report.winning_hypothesis
+    best_text = best.text.strip()
+    support_records = list(best.support_records)
     ruled_out_hypotheses = [
-        str(item["text"]).strip()
-        for item in scored_hypotheses[1:]
-        if item["rule_out_score"] > item["support_score"] and str(item["text"]).strip()
+        item.text.strip()
+        for item in scoring_report.hypotheses[1:]
+        if item.rule_out_score > item.support_score and item.text.strip()
     ]
 
     citations = _select_fallback_citations(support_records)
     if not citations:
         return None
 
-    evidence_summary = _build_evidence_summary(
-        latest_deployment=best.get("latest_deployment"),
-        rollback_deployment=best.get("rollback_deployment"),
-        cache_commits=best.get("cache_commits", []),
-        cache_logs=best.get("cache_logs", []),
-        database_logs=best.get("database_logs", []),
-        cache_metrics=best.get("cache_metrics", []),
-        rollback_recovery=best.get("rollback_recovery", []),
-    )
+    evidence_summary = build_evidence_summary(scoring_report)
     recommended_actions = _recommended_actions_from_runbooks(runbooks)
-    root_cause = _compose_root_cause(
-        best_hypothesis=best_text,
-        latest_deployment=best.get("latest_deployment"),
-        rollback_deployment=best.get("rollback_deployment"),
-        cache_commits=best.get("cache_commits", []),
-        cache_logs=best.get("cache_logs", []),
-        database_logs=best.get("database_logs", []),
-        rollback_recovery=best.get("rollback_recovery", []),
-    )
+    root_cause = compose_root_cause(scoring_report)
+    if not root_cause:
+        return None
 
     return RcaDraft(
         root_cause=root_cause,
@@ -427,164 +411,6 @@ def _synthesize_evidence_backed_draft(evidence_bundle: EvidenceBundle) -> RcaDra
 def rca_draft_placeholder(root_cause: str) -> str:
     """Return a stable synthetic raw output marker for deterministic fallback drafts."""
     return f"<deterministic_fallback>{root_cause}</deterministic_fallback>"
-
-
-def _analyze_hypotheses(evidence_bundle: EvidenceBundle) -> dict[str, dict[str, Any]]:
-    """Return deterministic support and rule-out evidence for each hypothesis."""
-    hypotheses = [record for record in evidence_bundle.hypotheses if str(record.get("text", "")).strip()]
-    if not hypotheses:
-        return {}
-
-    incident = evidence_bundle.incident or {}
-    deployments = sorted(evidence_bundle.deployments, key=lambda record: str(record.get("timestamp", "")))
-    commits = list(evidence_bundle.commits)
-    logs = list(evidence_bundle.logs)
-    metrics = list(evidence_bundle.metrics)
-    timeline = list(evidence_bundle.timeline)
-
-    latest_deployment = _latest_deployment_before_incident(deployments, incident)
-    rollback_deployment = _first_rollback_after_incident(deployments, incident)
-    cache_commits = _matching_records(commits, ("cache", "ttl", "warmup"))
-    cache_logs = _matching_records(logs, ("redis miss", "warmup", "ttl", "miss ratio", "cache"))
-    database_logs = _matching_records(logs, ("slow query", "postgres", "deadline exceeded", "db"))
-    healthy_cache_signals = _matching_records(
-        logs + timeline,
-        ("cluster health normal", "remained healthy", "cache node remained healthy", "within normal range", "success"),
-    )
-    rollback_recovery = _matching_records(
-        timeline + logs,
-        ("returned to baseline", "rollback completed", "200 128ms", "latency returned", "hit rate"),
-    )
-    cache_metrics = _matching_records(
-        metrics,
-        ("hit_rate", "p95_latency", "error_rate", "cpu_percent", "evictions_per_sec"),
-    )
-    db_metrics = _matching_records(metrics, ("postgres_read_replica.cpu_percent",))
-
-    analysis_by_text: dict[str, dict[str, Any]] = {}
-    for hypothesis in hypotheses:
-        text = str(hypothesis.get("text", "")).strip()
-        normalized = text.lower()
-        support_records: list[dict[str, Any]] = []
-        rule_out_records: list[dict[str, Any]] = []
-        support_score = 0
-        rule_out_score = 0
-
-        if "cache" in normalized:
-            support_records.extend(cache_commits[:2] + cache_logs[:4] + cache_metrics[:4] + rollback_recovery[:2])
-            support_score += 8 if cache_commits else 0
-            support_score += 6 if cache_logs else 0
-            support_score += 5 if cache_metrics else 0
-            support_score += 4 if rollback_recovery else 0
-            if latest_deployment is not None:
-                support_records.append(latest_deployment)
-                support_score += 3
-            if rollback_deployment is not None:
-                support_records.append(rollback_deployment)
-                support_score += 2
-
-        if "redis" in normalized:
-            support_records.extend(_matching_records(logs + metrics, ("redis",))[:3])
-            support_score += 2 if support_records else 0
-            rule_out_records.extend(healthy_cache_signals[:3] + rollback_recovery[:2] + cache_metrics[:2])
-            rule_out_score += 8 if healthy_cache_signals else 0
-            rule_out_score += 4 if rollback_recovery else 0
-            rule_out_score += 2 if cache_metrics else 0
-
-        if "database" in normalized or "postgres" in normalized or "db" in normalized:
-            support_records.extend(database_logs[:3] + db_metrics[:1])
-            support_score += 4 if database_logs else 0
-            support_score += 2 if db_metrics else 0
-            rule_out_records.extend(cache_commits[:2] + cache_logs[:3] + cache_metrics[:4] + healthy_cache_signals[:2] + rollback_recovery[:2])
-            rule_out_score += 6 if cache_commits else 0
-            rule_out_score += 6 if cache_logs else 0
-            rule_out_score += 5 if cache_metrics else 0
-            rule_out_score += 3 if healthy_cache_signals else 0
-            rule_out_score += 4 if rollback_recovery else 0
-
-        support_records = _dedupe_records(support_records)
-        rule_out_records = _dedupe_records(rule_out_records)
-        analysis_by_text[normalized] = {
-            "text": text,
-            "support_score": support_score,
-            "rule_out_score": rule_out_score,
-            "support_records": support_records,
-            "rule_out_records": rule_out_records,
-            "latest_deployment": latest_deployment,
-            "rollback_deployment": rollback_deployment,
-            "cache_commits": cache_commits,
-            "cache_logs": cache_logs,
-            "database_logs": database_logs,
-            "cache_metrics": cache_metrics,
-            "rollback_recovery": rollback_recovery,
-        }
-
-    return analysis_by_text
-
-
-def _latest_deployment_before_incident(
-    deployments: list[dict[str, Any]],
-    incident: dict[str, Any],
-) -> dict[str, Any] | None:
-    """Return the most recent deployment at or before incident start."""
-    incident_start = _parse_iso8601(incident.get("start_time"))
-    candidates = [
-        record
-        for record in deployments
-        if incident_start is not None and (_parse_iso8601(record.get("timestamp")) or incident_start) <= incident_start
-    ]
-    return candidates[-1] if candidates else (deployments[-1] if deployments else None)
-
-
-def _first_rollback_after_incident(
-    deployments: list[dict[str, Any]],
-    incident: dict[str, Any],
-) -> dict[str, Any] | None:
-    """Return the first rollback deployment after incident start when present."""
-    incident_start = _parse_iso8601(incident.get("start_time"))
-    for record in deployments:
-        strategy = str(record.get("strategy", "")).lower()
-        timestamp = _parse_iso8601(record.get("timestamp"))
-        if "rollback" in strategy and incident_start is not None and timestamp is not None and timestamp >= incident_start:
-            return record
-    return None
-
-
-def _matching_records(records: list[dict[str, Any]], keywords: tuple[str, ...]) -> list[dict[str, Any]]:
-    """Return records whose text fields mention any of the supplied keywords."""
-    matches: list[dict[str, Any]] = []
-    for record in records:
-        haystack = _record_text(record)
-        if any(keyword in haystack for keyword in keywords):
-            matches.append(record)
-    return matches
-
-
-def _record_text(record: dict[str, Any]) -> str:
-    """Return a normalized searchable text projection for one evidence record."""
-    parts: list[str] = []
-    for key in ("message", "event", "detail", "summary", "title", "metric", "text", "service", "component"):
-        value = record.get(key)
-        if isinstance(value, str) and value.strip():
-            parts.append(value.strip().lower())
-    for key in ("files_changed", "recommended_actions"):
-        value = record.get(key)
-        if isinstance(value, list):
-            parts.extend(str(item).strip().lower() for item in value if str(item).strip())
-    return " | ".join(parts)
-
-
-def _dedupe_records(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Return records with unique node IDs while preserving order."""
-    seen: set[str] = set()
-    deduped: list[dict[str, Any]] = []
-    for record in records:
-        node_id = str(record.get("node_id", "")).strip()
-        if not node_id or node_id in seen:
-            continue
-        seen.add(node_id)
-        deduped.append(record)
-    return deduped
 
 
 def _citations_from_records(records: list[dict[str, Any]]) -> list[RcaCitation]:
@@ -634,41 +460,6 @@ def _citation_explanation(record: dict[str, Any]) -> str:
     if isinstance(timestamp, str) and timestamp.strip():
         return f"Evidence observed at {timestamp.strip()}."
     return "Evidence contributing to the RCA."
-
-
-def _build_evidence_summary(
-    *,
-    latest_deployment: dict[str, Any] | None,
-    rollback_deployment: dict[str, Any] | None,
-    cache_commits: list[dict[str, Any]],
-    cache_logs: list[dict[str, Any]],
-    database_logs: list[dict[str, Any]],
-    cache_metrics: list[dict[str, Any]],
-    rollback_recovery: list[dict[str, Any]],
-) -> list[str]:
-    """Build compact evidence summary bullets from the strongest correlated evidence."""
-    summary: list[str] = []
-    if latest_deployment is not None:
-        summary.append(
-            f"Latency degradation began shortly after deployment {latest_deployment.get('deployment_id', latest_deployment.get('node_id'))} at {latest_deployment.get('timestamp')}."
-        )
-    if cache_commits:
-        summary.append(
-            "The deployed commits changed cache behavior, including TTL reduction and warmup skipping logic."
-        )
-    if cache_logs or cache_metrics:
-        summary.append(
-            "Catalog API logs and metrics show cache misses and a sharp Redis hit-rate drop coinciding with latency and error-rate increases."
-        )
-    if database_logs:
-        summary.append(
-            "Slow PostgreSQL reads appeared after the cache-miss spike, indicating downstream database pressure rather than a primary database-originating failure."
-        )
-    if rollback_deployment is not None or rollback_recovery:
-        summary.append(
-            "Rollback and subsequent recovery evidence show the issue subsided after the cache-related release was reverted."
-        )
-    return summary[:4]
 
 
 def _recommended_actions_from_runbooks(runbooks: list[dict[str, Any]]) -> list[str]:
@@ -737,73 +528,12 @@ def _graph_relationship_summaries(traversal_result: TraversalResult) -> list[str
     return [f"{relationship_type} ({count})" for relationship_type, count in ordered[:8]]
 
 
-def _compose_root_cause(
-    *,
-    best_hypothesis: str,
-    latest_deployment: dict[str, Any] | None,
-    rollback_deployment: dict[str, Any] | None,
-    cache_commits: list[dict[str, Any]],
-    cache_logs: list[dict[str, Any]],
-    database_logs: list[dict[str, Any]],
-    rollback_recovery: list[dict[str, Any]],
-) -> str:
-    """Compose one concise evidence-backed root-cause statement."""
-    deployment_id = latest_deployment.get("deployment_id") if latest_deployment is not None else None
-    deployment_time = latest_deployment.get("timestamp") if latest_deployment is not None else None
-    rollback_time = rollback_deployment.get("timestamp") if rollback_deployment is not None else None
-    commit_snippets = [
-        _short_commit_phrase(str(commit.get("message", "")).strip())
-        for commit in cache_commits[:2]
-        if str(commit.get("message", "")).strip()
-    ]
-    commit_clause = ", ".join(commit_snippets)
-
-    if "cache" in best_hypothesis.lower():
-        sentence = "Evidence most strongly supports cache churn from an application change."
-        if deployment_id and deployment_time:
-            sentence += f" Deployment {deployment_id} at {deployment_time} introduced cache-policy changes"
-            if commit_clause:
-                sentence += f" ({commit_clause})"
-            sentence += "."
-        if cache_logs:
-            sentence += " After the rollout, catalog-api logs showed repeated Redis misses and skipped warmup behavior."
-        if database_logs:
-            sentence += " The subsequent slow PostgreSQL reads appear to be secondary pressure from the cache miss spike rather than the primary fault."
-        if rollback_time or rollback_recovery:
-            sentence += f" Recovery after the rollback{f' at {rollback_time}' if rollback_time else ''} confirms the release as the strongest causal driver."
-        return sentence
-
-    sentence = f"Evidence most strongly supports {best_hypothesis}."
-    if deployment_id and deployment_time:
-        sentence += f" The strongest correlation begins immediately after deployment {deployment_id} at {deployment_time}."
-    if commit_clause:
-        sentence += f" Relevant changes in that release included {commit_clause}."
-    if rollback_time or rollback_recovery:
-        sentence += f" Recovery after the rollback{f' at {rollback_time}' if rollback_time else ''} strengthens that conclusion."
-    return sentence
-
-
-def _short_commit_phrase(message: str) -> str:
-    """Return a compact commit summary for RCA prose."""
-    normalized = re.sub(r"\s+", " ", message).strip()
-    return normalized[:90].rstrip(".")
-
 
 def _truncate_text(value: str, *, limit: int) -> str:
     """Truncate one string deterministically."""
     if len(value) <= limit:
         return value
     return value[: max(0, limit - 3)].rstrip() + "..."
-
-
-def _parse_iso8601(value: Any) -> datetime | None:
-    """Parse one dataset timestamp into a datetime when possible."""
-    if not isinstance(value, str) or not value.strip():
-        return None
-    try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError:
-        return None
 
 
 def _traversal_summary(
@@ -844,6 +574,8 @@ def _traversal_summary(
             "services": list(entities.services),
             "symptoms": list(entities.symptoms),
             "time_references": list(entities.time_references),
+            "operational_terms": list(entities.operational_terms),
+            "semantic_terms": list(entities.semantic_terms),
         }
         summary["incident_candidates"] = [
             {

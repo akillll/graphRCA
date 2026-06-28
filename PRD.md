@@ -3,12 +3,30 @@
 ## GraphRAG-Powered Incident Root Cause Analysis System
 
 **Version:** 1.1  
-**Status:** Design ready for implementation  
+**Status:** Working local assessment prototype; benchmark-first, not production-ready  
 **Target Build Window:** Weekend assessment  
 **Hardware Target:** MacBook Air M1, 8GB RAM  
 **Primary Graph Contract:** `GRAPH_SPEC.md`
 
 ## 1. Overview
+
+### 1.0 Assessment Positioning
+
+GraphRCA was built as an FDE assessment project for a GraphRAG task using a local LLM and `llama.cpp`.
+
+The current system should be understood as:
+
+- a benchmark-driven local GraphRAG prototype
+- a replayable investigation system over a fixed synthetic dataset
+- a demonstration of graph-first retrieval, evidence aggregation, and local RCA generation
+
+The current system should not be understood as:
+
+- a production incident management platform
+- a live observability integration
+- a fully hardened or fully generalized RCA engine
+
+This distinction matters. The repository is optimized to show the GraphRAG thesis clearly on a controlled benchmark dataset, not to maximize production breadth.
 
 ### 1.1 Problem Statement
 
@@ -16,7 +34,7 @@ Incident responders manually correlate logs, metrics, deployments, commits, runb
 
 ### 1.2 Product Goal
 
-GraphRCA builds a local evidence graph from a benchmark incident dataset. At query time it traverses the graph, gathers evidence across sources, enriches the result with local vector retrieval, and generates an RCA using a local llama.cpp model.
+GraphRCA builds a local evidence graph from a benchmark incident dataset. At query time it traverses the graph, gathers evidence across sources, and generates an RCA using a local llama.cpp model. The current implementation emphasizes graph retrieval, semantic incident resolution, and deterministic hypothesis scoring over production breadth.
 
 The output must show:
 
@@ -31,6 +49,8 @@ The output must show:
 Incidents are naturally graph-shaped. A useful RCA depends on relationships: what changed, when symptoms began, which services were involved, which metrics moved first, which log patterns appeared, and what runbooks match the symptoms.
 
 Traditional vector RAG retrieves text chunks, but it does not preserve temporal ordering, service relationships, or evidence provenance. GraphRCA uses graph traversal as the primary retrieval mechanism and vector search only to enrich the traversed evidence with semantically relevant runbook or log context.
+
+In the current implementation, graph traversal and deterministic evidence assembly are the primary working retrieval mechanisms. Vector enrichment remains part of the intended architecture, but it is not the core implemented differentiator today.
 
 ### 1.4 Non-Negotiable Boundary
 
@@ -51,15 +71,15 @@ Runtime answers must be generated from:
 
 ### 2.1 Goals
 
-- Build a locally runnable GraphRAG system using Neo4j, FastAPI, Chainlit, llama.cpp, and local embeddings.
+- Build a locally runnable GraphRAG system using Neo4j, FastAPI, Chainlit, and llama.cpp.
 - Ingest the current 12-incident benchmark dataset into an evidence-oriented graph.
 - Use deterministic canonical IDs for idempotent graph construction.
 - Avoid deterministic causal truth edges during ingestion.
 - Retrieve evidence primarily through Cypher graph traversal.
-- Use vector search to enrich graph results with relevant runbook/log context.
 - Generate RCA responses with node-level citations.
 - Make hypothesis support and elimination visible.
 - Evaluate against benchmark ground truth without leaking ground truth into runtime.
+- Demonstrate benchmark-oriented GraphRAG design clearly enough for assessment review by an engineering leader.
 
 ### 2.2 Non-Goals
 
@@ -68,6 +88,7 @@ Runtime answers must be generated from:
 - Multi-tenant authentication.
 - ReAct-style dynamic tool loops.
 - Full production deployment hardening.
+- Real production incident workflows, alert ingestion, or tenancy boundaries.
 - Frontend graph visualization beyond readable Chainlit steps.
 - Manual ingestion of final RCA ground truth.
 
@@ -193,12 +214,11 @@ Implementation must follow these principles:
 |---|---|---|
 | Graph DB | Neo4j 5.x | Native graph traversal and Cypher |
 | Local LLM | llama.cpp, small quantized model | Runs locally on M1 hardware |
-| Embeddings | local sentence-transformer | Lightweight semantic retrieval |
 | Backend | FastAPI | Simple API and OpenAPI support |
 | UI | Chainlit | Step-based investigation display |
-| Runtime | Docker Compose | One-command local demo |
+| Runtime | local Python processes | Minimal local assessment setup |
 
-### 5.2 Recommended Codebase Layout
+### 5.2 Current Codebase Layout
 
 The following structure is a good fit for the weekend build because it separates deterministic parsing, LLM-assisted enrichment, graph retrieval, prompt construction, API wiring, and offline evaluation without introducing too many layers:
 
@@ -214,22 +234,21 @@ graphRCA/
 │   │   └── timeline.py
 │   └── llm/
 │       ├── log_patterns.py
-│       ├── hypothesis_scoring.py
 │       └── runbook_matching.py
 ├── retrieval/
 ├── prompting/
 ├── api/
-└── evaluation/
+└── ui/
 ```
 
 Responsibilities:
 
 - `ingestion/deterministic/`: parse source files into canonical nodes and deterministic edges
-- `ingestion/llm/`: semantic extraction that adds provenance-tagged nodes or edges
-- `retrieval/`: Neo4j access, Cypher queries, graph traversal, neighborhood expansion, and evidence assembly
+- `ingestion/llm/`: planned semantic extraction that adds provenance-tagged nodes or edges
+- `retrieval/`: Neo4j access, Cypher queries, semantic incident resolution, graph traversal, deterministic hypothesis scoring, and evidence assembly
 - `prompting/`: structured prompt builders for entity extraction and RCA generation
 - `api/`: FastAPI routes, response schemas, and app wiring
-- `evaluation/`: benchmark runners and scoring against `expected_rca.json`
+- `ui/`: Chainlit investigation display over the backend API
 
 Implementation note:
 
@@ -240,13 +259,11 @@ Implementation note:
 ```text
 Incident JSON + runbooks
   -> deterministic ingestion
-  -> LLM-assisted semantic extraction
   -> Neo4j evidence graph
-  -> local vector index for runbook/log enrichment
-  -> query entity extraction
+  -> semantic incident resolution
   -> graph traversal
   -> evidence aggregation
-  -> vector enrichment
+  -> deterministic hypothesis scoring
   -> llama.cpp RCA generation
   -> FastAPI + Chainlit response
 ```
@@ -255,14 +272,32 @@ Incident JSON + runbooks
 
 ```text
 User question
-  -> extract incident/service/symptom/time entities
-  -> find matching incident or service nodes
+  -> extract incident/service/symptom/time/semantic hints
+  -> resolve likely incident with exact + semantic matching
   -> traverse evidence neighborhood
   -> aggregate deployments, commits, metrics, logs, runbooks, context
-  -> retrieve relevant runbook passages
+  -> score competing hypotheses deterministically
   -> assemble structured prompt
   -> generate RCA with citations
 ```
+
+### 5.5 Current Implementation Snapshot
+
+Implemented today:
+
+- deterministic ingestion for benchmark incidents and runbooks
+- runtime exclusion of `expected_rca.json`
+- FastAPI backend and Chainlit UI
+- graph traversal and evidence bundle assembly
+- exact plus semantic incident resolution
+- deterministic fallback hypothesis scoring using generic failure patterns mapped from dataset hypotheses
+
+Not yet implemented end to end:
+
+- LLM-assisted ingestion enrichment
+- robust vector retrieval or embedding-backed enrichment
+- formal offline benchmark runner under a dedicated `evaluation/` package
+- production deployment packaging such as Docker Compose in this repository
 
 ## 6. Ingestion Requirements
 
@@ -290,6 +325,11 @@ Use LLM assistance only where it has clear value:
 - mapping timeline prose to known evidence nodes
 
 LLM outputs must be structured, validated, and tagged with provenance.
+
+Current state:
+
+- deterministic ingestion is implemented
+- LLM-assisted ingestion enrichment is planned but not active in the current pipeline
 
 ### 6.3 Ground Truth Exclusion
 
@@ -329,6 +369,12 @@ Vector retrieval should not:
 - invent missing service topology
 - override graph evidence
 - generate citations that do not map back to graph nodes
+
+Current state:
+
+- graph-first retrieval is implemented
+- semantic incident resolution is implemented
+- vector enrichment remains a planned extension rather than a central implemented capability
 
 ## 8. API Requirements
 
@@ -398,6 +444,12 @@ Use the benchmark files:
 - `data/evaluations/benchmark_hard.json`
 
 Use each incident's `expected_rca.json` only after the runtime system has produced an answer.
+
+Current state:
+
+- the benchmark dataset and evaluation fixtures are present
+- the runtime system is intentionally separated from evaluation-only labels
+- a fully packaged offline evaluation runner is still pending
 
 ### 10.2 Metrics
 
@@ -488,11 +540,12 @@ This field must remain evaluation-only.
 
 ## 12. Weekend Build Plan
 
+This section describes the intended assessment build plan. Some phases are now implemented in the repo, while others remain partial or deferred.
+
 ### Phase 0 - Scaffold
 
-- Docker Compose with Neo4j, backend, and Chainlit service definitions.
 - Local llama.cpp configuration documented.
-- `.env.example` with Neo4j and model settings.
+- `.env`-driven local configuration documented.
 
 ### Phase 1 - Graph Contract and Client
 
@@ -518,12 +571,17 @@ Implementation ordering note:
 - Extract runbook actions if needed.
 - Generate hypothesis `SUPPORTS` and `RULES_OUT` edges with provenance.
 
+Current repo status:
+
+- deferred; base deterministic pipeline is prioritized and active
+
 ### Phase 4 - GraphRAG Query Engine
 
 - Entity extraction.
 - Incident/service lookup.
+- Semantic incident resolution.
 - Evidence neighborhood traversal.
-- Vector enrichment for runbooks.
+- Deterministic hypothesis scoring fallback.
 - Structured prompt assembly.
 - RCA generation with citations.
 
@@ -541,6 +599,11 @@ Implementation ordering note:
 - Document known limitations.
 - Leave confidence scoring out of the initial benchmark report.
 
+Current repo status:
+
+- documentation and benchmark separation are in place
+- formal automated evaluation reporting remains to be built out
+
 ## 13. Risk Register
 
 | Risk | Likelihood | Mitigation |
@@ -557,6 +620,7 @@ Implementation ordering note:
 The assessment is successful when:
 
 - docs match the actual dataset
+- docs make clear that this is a benchmark-oriented local prototype, not a production system
 - graph construction is deterministic and replayable
 - `expected_rca.json` is excluded from runtime ingestion
 - all 12 incidents can be ingested
