@@ -6,26 +6,16 @@ used by prompt builders, parsers, API handlers, and offline evaluation code.
 """
 
 from __future__ import annotations
-
 from typing import Annotated, Any, Literal, TypeAlias
-
 from pydantic import BaseModel, ConfigDict, Field
 
 
 NonEmptyString = Annotated[str, Field(min_length=1)]
-"""Reusable constrained string type for required human-readable fields."""
-
 JsonScalar: TypeAlias = str | int | float | bool | None
-"""JSON-compatible scalar value used in prompt metadata and evidence payloads."""
-
-JsonValue: TypeAlias = JsonScalar | list["JsonValue"] | dict[str, "JsonValue"]
-"""Recursive JSON-compatible value used for prompt metadata and generic evidence payloads."""
-
-EvidenceRecord: TypeAlias = dict[str, JsonValue]
-"""Generic serializable evidence record carried from retrieval into prompting."""
-
+JsonValue: TypeAlias = Any
+EvidenceRecord: TypeAlias = dict[str, Any]
 PromptRole: TypeAlias = Literal["system", "user", "assistant"]
-"""Allowed chat roles for prompt messages."""
+
 
 
 class PromptBaseModel(BaseModel):
