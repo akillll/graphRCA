@@ -7,6 +7,7 @@ or CLI handling.
 
 from __future__ import annotations
 
+from prompting.serializer import PromptSerializer
 from prompting.types import PromptContext
 
 
@@ -24,12 +25,11 @@ You must follow these rules exactly:
 8. Prefer precise evidence-backed statements over confident-sounding generalizations.
 9. If evidence is missing or ambiguous, state the limitation instead of filling the gap.
 
-Produce output in this order:
+Return only one JSON object.
+Do not include markdown fences.
+Do not include explanatory prose before or after the JSON object.
 
-1. Structured RCA
-2. Explanatory prose
-
-The Structured RCA section must contain:
+The JSON object must contain exactly these top-level fields:
 - root_cause
 - evidence_summary
 - supported_hypotheses
@@ -37,7 +37,9 @@ The Structured RCA section must contain:
 - recommended_actions
 - citations
 
-The explanatory prose must remain grounded in the same supplied evidence and must not introduce uncited claims.
+`root_cause` must be a non-empty string.
+`evidence_summary`, `supported_hypotheses`, `ruled_out_hypotheses`, and `recommended_actions` must be arrays of strings.
+`citations` must be an array of objects with `node_id`, `node_label`, and `explanation`.
 """
 """Canonical system prompt for grounded RCA generation."""
 
@@ -47,8 +49,28 @@ USER_PROMPT_TEMPLATE = """Original user question:
 
 Serialized prompt context:
 {serialized_context}
+
+Return the RCA as JSON only, with this shape:
+{{
+  "root_cause": "string",
+  "evidence_summary": ["string"],
+  "supported_hypotheses": ["string"],
+  "ruled_out_hypotheses": ["string"],
+  "recommended_actions": ["string"],
+  "citations": [
+    {{
+      "node_id": "string",
+      "node_label": "string",
+      "explanation": "string"
+    }}
+  ]
+}}
 """
 """Canonical user prompt template for grounded RCA generation."""
+
+
+_PROMPT_SERIALIZER = PromptSerializer()
+"""Shared compact serializer for user-prompt evidence context."""
 
 
 def render_system_prompt() -> str:
@@ -69,7 +91,7 @@ def render_user_prompt(context: PromptContext, *, question: str | None = None) -
     """
 
     resolved_question = (question or context.question).strip()
-    serialized_context = context.model_dump_json(indent=2)
+    serialized_context = _PROMPT_SERIALIZER.serialize(context)
     return USER_PROMPT_TEMPLATE.format(
         question=resolved_question,
         serialized_context=serialized_context,

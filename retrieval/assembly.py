@@ -233,6 +233,11 @@ def _runbook_record(entry: dict[str, Any]) -> dict[str, Any]:
         for node in entry.get("recommended_actions", [])
         if node.get("node_id")
     ]
+    runbook["recommended_actions"] = [
+        str(node.get("properties", {}).get("text", "")).strip()
+        for node in entry.get("recommended_actions", [])
+        if str(node.get("properties", {}).get("text", "")).strip()
+    ]
     return runbook
 
 

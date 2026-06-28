@@ -23,7 +23,7 @@ DEFAULT_BACKEND_BASE_URL = "http://127.0.0.1:8000"
 DEFAULT_INVESTIGATE_ENDPOINT = "/investigate"
 """Default backend path for the main RCA investigation endpoint."""
 
-DEFAULT_REQUEST_TIMEOUT_SECONDS = 120.0
+DEFAULT_REQUEST_TIMEOUT_SECONDS = 300.0
 """Default backend request timeout suitable for local llama.cpp inference."""
 
 

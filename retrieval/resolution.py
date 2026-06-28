@@ -4,11 +4,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
+import re
 from typing import Any
 
 from ingestion.common.ids import incident_id as canonical_incident_id
 from retrieval.client import Neo4jReadClient
 from retrieval.queries import (
+    ALL_INCIDENTS_QUERY,
     INCIDENT_BY_ID_QUERY,
     INCIDENTS_BY_PRIMARY_SERVICE_QUERY,
     SERVICE_BY_ALIAS_QUERY,
@@ -52,6 +54,7 @@ class IncidentResolver:
         self._add_incident_id_matches(candidates, entities)
         self._add_service_name_matches(candidates, entities)
         self._add_service_alias_matches(candidates, entities)
+        self._add_broad_incident_matches(candidates, entities)
         self._apply_time_hint_adjustments(candidates, entities.time_references)
         self._apply_symptom_adjustments(candidates, entities.symptoms)
 
@@ -66,7 +69,7 @@ class IncidentResolver:
                 reasons=candidate.reasons,
             )
             for candidate in ranked
-            if candidate.score > 0
+            if candidate.score >= 0.25
         ]
 
     def __call__(self, entities: ExtractedEntities) -> list[IncidentCandidate]:
@@ -172,6 +175,48 @@ class IncidentResolver:
                 continue
             for symptom in matched_symptoms:
                 candidate.add(0.15, f"symptom phrase match: {symptom}")
+
+    def _add_broad_incident_matches(
+        self,
+        candidates: dict[str, _CandidateState],
+        entities: ExtractedEntities,
+    ) -> None:
+        """Seed candidates from broad incident metadata when exact service matching is absent."""
+        question_tokens = _question_tokens(entities.raw_question)
+        if not question_tokens and not entities.time_references and not entities.symptoms:
+            return
+
+        rows = self._client.run_query(ALL_INCIDENTS_QUERY)
+        for row in rows:
+            payload = row.get("result", {})
+            incident = payload.get("incident") or {}
+            state = self._candidate_state(candidates, incident)
+            searchable = _incident_searchable_text(state.properties)
+            matched_tokens = [
+                token
+                for token in question_tokens
+                if len(token) >= 4 and (token in searchable or _singularize_token(token) in searchable)
+            ]
+            for token in matched_tokens[:4]:
+                state.add(0.12, f"incident text match: {token}")
+
+            if entities.time_references:
+                matched_hints = [
+                    hint
+                    for hint in entities.time_references
+                    if _incident_matches_time_hint(state.properties, hint)
+                ]
+                for hint in matched_hints:
+                    state.add(0.28, f"time hint match: {hint}")
+
+            if entities.symptoms:
+                matched_symptoms = [
+                    symptom
+                    for symptom in entities.symptoms
+                    if symptom.lower() in searchable
+                ]
+                for symptom in matched_symptoms:
+                    state.add(0.12, f"incident symptom text match: {symptom}")
 
     @staticmethod
     def _candidate_state(
@@ -349,3 +394,63 @@ def _parse_month_day_hint(value: str) -> dict[str, int | str] | None:
         return {"kind": "date", "year": year, "month": month, "day": day}
 
     return {"kind": "month_day", "month": month, "day": day}
+
+
+_TOKEN_RE = re.compile(r"[a-z0-9]+")
+_STOPWORDS = {
+    "what",
+    "caused",
+    "cause",
+    "why",
+    "did",
+    "the",
+    "on",
+    "in",
+    "of",
+    "to",
+    "a",
+    "an",
+    "and",
+    "for",
+    "this",
+    "that",
+    "slow",
+    "down",
+}
+
+
+def _question_tokens(question: str) -> list[str]:
+    """Return stable searchable tokens from the raw user question."""
+    tokens: list[str] = []
+    seen: set[str] = set()
+    for token in _TOKEN_RE.findall(question.lower()):
+        if len(token) < 3 or token in _STOPWORDS:
+            continue
+        normalized = _singularize_token(token)
+        if normalized in seen:
+            continue
+        seen.add(normalized)
+        tokens.append(normalized)
+    return tokens
+
+
+def _incident_searchable_text(properties: dict[str, Any]) -> str:
+    """Return a normalized searchable projection for one incident."""
+    parts: list[str] = []
+    for key in ("id", "title", "summary", "service", "severity", "difficulty"):
+        value = properties.get(key)
+        if isinstance(value, str) and value.strip():
+            parts.append(value.strip().lower())
+    tags = properties.get("tags")
+    if isinstance(tags, list):
+        parts.extend(str(item).strip().lower() for item in tags if str(item).strip())
+    return " | ".join(parts)
+
+
+def _singularize_token(token: str) -> str:
+    """Return a lightweight singularized token for fuzzy lexical matching."""
+    if token.endswith("ies") and len(token) > 4:
+        return token[:-3] + "y"
+    if token.endswith("s") and not token.endswith("ss") and len(token) > 4:
+        return token[:-1]
+    return token

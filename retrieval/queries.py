@@ -21,6 +21,20 @@ RETURN {
 """Lookup one incident by canonical incident ID."""
 
 
+ALL_INCIDENTS_QUERY = """
+MATCH (incident:Incident)
+RETURN {
+  incident: {
+    node_id: incident.id,
+    node_labels: labels(incident),
+    properties: properties(incident)
+  }
+} AS result
+ORDER BY incident.start_time DESC, incident.id ASC
+""".strip()
+"""Lookup all incidents with compact metadata for broad candidate resolution."""
+
+
 INCIDENTS_BY_PRIMARY_SERVICE_QUERY = """
 MATCH (incident:Incident {service: $service_name})
 OPTIONAL MATCH (incident)-[observed_on:OBSERVED_ON]->(service:Service {name: $service_name})
@@ -92,7 +106,8 @@ OPTIONAL MATCH (incident)<-[observed_in:OBSERVED_IN]-(incident_neighbor)
 OPTIONAL MATCH (incident)-[incident_out:OBSERVED_ON|MATCHES|OCCURRED_AFTER]->(incident_target)
 OPTIONAL MATCH (incident)-[incident_service_edge:OBSERVED_ON]->(service:Service)
 OPTIONAL MATCH (hypothesis:Hypothesis)-[hypothesis_in:OBSERVED_IN]->(incident)
-OPTIONAL MATCH (supporting_evidence)-[hypothesis_signal:SUPPORTS|RULES_OUT]->(hypothesis)
+OPTIONAL MATCH (supporting_evidence)-[hypothesis_signal]->(hypothesis)
+WHERE type(hypothesis_signal) IN ['SUPPORTS', 'RULES_OUT']
 OPTIONAL MATCH (timeline:TimelineEvent)-[timeline_in:OBSERVED_IN]->(incident)
 OPTIONAL MATCH (timeline)-[timeline_ref:REFERENCES]->(timeline_reference)
 OPTIONAL MATCH (runbook:Runbook)<-[runbook_match:MATCHES]-(incident)
@@ -178,8 +193,7 @@ WITH
     target_id: endNode(runbook_match).id,
     properties: properties(runbook_match)
   }} END) WHERE item IS NOT NULL] AS runbook_match_edges
-CALL {{
-  WITH service_ids
+CALL (service_ids) {{
   OPTIONAL MATCH path = (service:Service)-[:DEPENDS_ON*1..{hops}]-(related:Service)
   WHERE service.id IN service_ids
   WITH
@@ -566,8 +580,10 @@ RETURN {
 
 HYPOTHESES_FOR_INCIDENT_QUERY = """
 MATCH (hypothesis:Hypothesis)-[observed_in:OBSERVED_IN]->(incident:Incident {id: $incident_id})
-OPTIONAL MATCH (supporting_evidence)-[supports:SUPPORTS]->(hypothesis)
-OPTIONAL MATCH (counter_evidence)-[rules_out:RULES_OUT]->(hypothesis)
+OPTIONAL MATCH (supporting_evidence)-[supports]->(hypothesis)
+WHERE type(supports) = 'SUPPORTS'
+OPTIONAL MATCH (counter_evidence)-[rules_out]->(hypothesis)
+WHERE type(rules_out) = 'RULES_OUT'
 WITH
   incident,
   hypothesis,
@@ -689,8 +705,7 @@ WITH
     target_id: endNode(observed_on).id,
     properties: properties(observed_on)
   }}) WHERE item IS NOT NULL] AS incident_service_edges
-CALL {{
-  WITH service_ids
+CALL (service_ids) {{
   OPTIONAL MATCH path = (service:Service)-[:DEPENDS_ON*1..{hops}]-(related:Service)
   WHERE service.id IN service_ids
   WITH
@@ -741,6 +756,7 @@ SERVICE_TOPOLOGY_FOR_INCIDENT_QUERY = build_service_topology_for_incident_query(
 
 
 __all__ = [
+    "ALL_INCIDENTS_QUERY",
     "INCIDENT_BY_ID_QUERY",
     "INCIDENTS_BY_PRIMARY_SERVICE_QUERY",
     "SERVICE_BY_NAME_QUERY",

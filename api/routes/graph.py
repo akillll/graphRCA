@@ -27,15 +27,15 @@ router = APIRouter(tags=["graph"])
 
 
 GRAPH_COUNTS_QUERY = """
-CALL {
+CALL () {
   MATCH (n)
   RETURN count(n) AS node_count
 }
-CALL {
+CALL () {
   MATCH ()-[r]->()
   RETURN count(r) AS edge_count
 }
-CALL {
+CALL () {
   MATCH (incident:Incident)
   RETURN count(incident) AS incident_count
 }

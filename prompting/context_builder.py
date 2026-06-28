@@ -140,6 +140,7 @@ _DEFAULT_KEEP_FIELDS: dict[str, tuple[str, ...]] = {
         "title",
         "summary",
         "recommended_action_ids",
+        "recommended_actions",
     ),
 }
 """Field allowlists per evidence section used to keep prompt payloads compact."""

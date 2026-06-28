@@ -11,7 +11,7 @@ DEFAULT_APP_NAME = "GraphRCA API"
 DEFAULT_APP_ENV = "development"
 DEFAULT_NEO4J_DATABASE = "neo4j"
 DEFAULT_LLAMA_BASE_URL = "http://127.0.0.1:8080/v1/chat/completions"
-DEFAULT_LLAMA_TIMEOUT_SECONDS = 60.0
+DEFAULT_LLAMA_TIMEOUT_SECONDS = 300.0
 
 
 @dataclass(frozen=True, slots=True)

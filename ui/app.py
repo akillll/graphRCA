@@ -67,9 +67,9 @@ class UiApplication:
                 content="The backend API is unavailable. Start the FastAPI server and verify the UI backend URL settings."
             ).send()
             return
-        except UiApiMalformedResponseError:
+        except UiApiMalformedResponseError as exc:
             await cl.Message(
-                content="The backend returned an unreadable investigation response. Check the API logs and try again."
+                content=f"The backend returned an unreadable investigation response. {exc}"
             ).send()
             return
         except UiApiResponseError as exc:
@@ -121,6 +121,7 @@ async def on_message(message: cl.Message) -> None:
 
 def _response_error_message(error: UiApiResponseError) -> str:
     """Map backend API errors into short user-facing UI messages."""
+    backend_reason = _backend_error_reason(error.details)
     if error.error_code == "incident_not_found":
         return "No matching incident was found for that question. Try a more specific incident, service, or date reference."
     if error.error_code == "graph_unavailable":
@@ -128,7 +129,19 @@ def _response_error_message(error: UiApiResponseError) -> str:
     if error.error_code == "model_unavailable":
         return "The local llama.cpp server is unavailable or returned an invalid response. Check the model server and try again."
     if error.error_code == "prompting_failed":
+        if backend_reason:
+            return f"The backend could not complete RCA generation for that investigation. Reason: {backend_reason}"
         return "The backend could not complete RCA generation for that investigation. Check the backend logs and try again."
     if error.status_code >= 500:
         return "The backend encountered an internal error while processing the investigation."
     return error.args[0] if error.args else "The investigation request failed."
+
+
+def _backend_error_reason(details: dict[str, object] | None) -> str | None:
+    """Extract a short backend-supplied reason string when available."""
+    if not details:
+        return None
+    reason = details.get("reason")
+    if isinstance(reason, str) and reason.strip():
+        return reason.strip()
+    return None

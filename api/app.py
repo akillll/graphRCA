@@ -7,6 +7,8 @@ Business logic remains in the API service layer.
 
 from __future__ import annotations
 
+import logging
+
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
@@ -17,6 +19,7 @@ from api.routes.investigate import router as investigate_router
 
 
 settings = get_settings()
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title=settings.app_name,
@@ -27,6 +30,7 @@ app = FastAPI(
 @app.exception_handler(ApiError)
 def handle_api_error(_: Request, exc: ApiError) -> JSONResponse:
     """Return a stable JSON error envelope for known API exceptions."""
+    logger.warning("API error: %s details=%s", exc.message, exc.details)
     return JSONResponse(
         status_code=exc.status_code,
         content=to_error_response(exc).model_dump(),
@@ -36,6 +40,7 @@ def handle_api_error(_: Request, exc: ApiError) -> JSONResponse:
 @app.exception_handler(Exception)
 def handle_unexpected_error(_: Request, exc: Exception) -> JSONResponse:
     """Return a stable JSON error envelope for uncaught internal failures."""
+    logger.exception("Unexpected API error", exc_info=exc)
     error = UnexpectedApiError(
         "An unexpected API error occurred.",
         details={"reason": str(exc)} if settings.app_env != "production" else None,

@@ -1,0 +1,73 @@
+1. What caused the entitlement checks to slow down on April 9?
+## Incident Resolution
+- Resolved incident: `incident:medium_replica_lag_entitlements_2026_04_09`
+- Extracted services: Not provided
+- Symptoms: Not provided
+- Time references: Not provided
+
+## Evidence Summary
+- Traversal: incident `incident:medium_replica_lag_entitlements_2026_04_09`, 67 nodes, 97 edges, 1 candidates considered
+- Evidence counts: citations=67, commits=3, configurations=6, deployments=3, hypotheses=4, logs=15, metrics=6, runbooks=2, services=7, timeline=8
+- Important nodes: Incident `incident:medium_replica_lag_entitlements_2026_04_09`, Service `service:billing-postgres`, Service `service:billing-reconciler`, Service `service:checkout-service`, Service `service:deploy-controller`, Service `service:entitlements-api`, Service `service:postgres-primary`, Service `service:support-bot`
+- Graph relationships: OBSERVED_IN (41), OBSERVED_ON (25), OCCURRED_AFTER (10), RECOMMENDS (6), REFERENCES (6), CHANGED (4), INCLUDED_IN (3), MATCHES (2)
+
+## Hypothesis Evaluation
+- Supported: cache issue (`commit:d8e0f14`, `log_event:medium_replica_lag_entitlements_2026_04_09:2026-04-09T02:14:10Z:ent-42b9`, `log_event:medium_replica_lag_entitlements_2026_04_09:2026-04-09T02:24:12Z:ent-43f2`, `metric_series:medium_replica_lag_entitlements_2026_04_09:billing_postgres.primary_cpu_percent`, `metric_series:medium_replica_lag_entitlements_2026_04_09:entitlements_api.cache_hit_rate_percent`, `log_event:medium_replica_lag_entitlements_2026_04_09:2026-04-09T02:41:13Z:deploy-ent95`, `deployment:entitlements-prod-9101`, `deployment:entitlements-prod-9102`)
+- Ruled out: database saturation (`log_event:medium_replica_lag_entitlements_2026_04_09:2026-04-09T02:14:11Z:ent-42b9`, `log_event:medium_replica_lag_entitlements_2026_04_09:2026-04-09T02:16:52Z:pg-5511`, `log_event:medium_replica_lag_entitlements_2026_04_09:2026-04-09T02:33:49Z:ent-44be`)
+- Considered: replica lag (no direct evidence refs); subscription write failure (no direct evidence refs)
+
+## Root Cause Analysis
+- RCA: Evidence most strongly supports cache churn from an application change. Deployment entitlements-prod-9101 at 2026-04-09T02:03:28Z introduced cache-policy changes (Prefer replica for entitlement reads on cache miss to reduce primary pressure). After the rollout, catalog-api logs showed repeated Redis misses and skipped warmup behavior. The subsequent slow PostgreSQL reads appear to be secondary pressure from the cache miss spike rather than the primary fault. Recovery after the rollback at 2026-04-09T02:39:12Z confirms the release as the strongest causal driver.
+- Citations: `deployment:entitlements-prod-9101` (Deployment: Evidence observed at 2026-04-09T02:03:28Z.); `commit:d8e0f14` (Commit: Prefer replica for entitlement reads on cache miss to reduce primary pressure); `log_event:medium_replica_lag_entitlements_2026_04_09:2026-04-09T02:14:10Z:ent-42b9` (LogEvent: cache miss for account_id=acc_22191 feature-set); `metric_series:medium_replica_lag_entitlements_2026_04_09:billing_postgres.primary_cpu_percent` (MetricSeries: metric:billing_postgres.primary_cpu_percent); `log_event:medium_replica_lag_entitlements_2026_04_09:2026-04-09T02:24:12Z:ent-43f2` (LogEvent: cache refresh skipped because read source returned no active subscription rows); `metric_series:medium_replica_lag_entitlements_2026_04_09:entitlements_api.cache_hit_rate_percent` (MetricSeries: metric:entitlements_api.cache_hit_rate_percent); `log_event:medium_replica_lag_entitlements_2026_04_09:2026-04-09T02:41:13Z:deploy-ent95` (LogEvent: Rollback completed for entitlements-api version 2026.04.09.1); `deployment:entitlements-prod-9102` (Deployment: Evidence observed at 2026-04-09T02:39:12Z.)
+- Recommended actions: Add read-after-write guardrails for freshness-sensitive paths, Instrument stale-read indicators directly, Validate consistency-sensitive changes under concurrent batch-job load, Route freshness-sensitive reads to primary when lag is elevated, Add alerts that tie replica lag to stale-read symptoms
+- Warnings: None
+
+2. Why did media processing fail on May 22?
+## Incident Resolution
+- Resolved incident: `incident:medium_media_worker_memory_leak_2026_05_22`
+- Extracted services: Not provided
+- Symptoms: Not provided
+- Time references: Not provided
+
+## Evidence Summary
+- Traversal: incident `incident:medium_media_worker_memory_leak_2026_05_22`, 72 nodes, 104 edges, 5 candidates considered
+- Evidence counts: citations=72, commits=3, configurations=7, deployments=3, hypotheses=4, logs=18, metrics=6, runbooks=2, services=8, timeline=8
+- Important nodes: Incident `incident:medium_media_worker_memory_leak_2026_05_22`, Service `service:autoscaler`, Service `service:cdn-purger`, Service `service:deploy-controller`, Service `service:growth-campaigns`, Service `service:kubelet`, Service `service:media-worker`, Service `service:s3-gateway`
+- Graph relationships: OBSERVED_IN (44), OBSERVED_ON (28), OCCURRED_AFTER (10), RECOMMENDS (6), REFERENCES (6), CHANGED (5), INCLUDED_IN (3), MATCHES (2)
+
+## Hypothesis Evaluation
+- Supported: None
+- Ruled out: None
+- Considered: insufficient scaling (no direct evidence refs); object storage latency (no direct evidence refs); upload traffic surge (no direct evidence refs); worker memory growth (no direct evidence refs)
+
+## Root Cause Analysis
+- RCA: Unable to parse a grounded root cause from the model output.
+- Citations: None
+- Recommended actions: Not provided
+- Warnings: The RCA draft did not include any citations.
+
+What caused the queue backlog to spike on March 18?
+## Incident Resolution
+- Resolved incident: `incident:medium_queue_autoscaling_regression_2026_03_18`
+- Extracted services: Not provided
+- Symptoms: Not provided
+- Time references: Not provided
+
+## Evidence Summary
+- Traversal: incident `incident:medium_queue_autoscaling_regression_2026_03_18`, 71 nodes, 104 edges, 4 candidates considered
+- Evidence counts: citations=71, commits=3, configurations=6, deployments=3, hypotheses=4, logs=16, metrics=6, runbooks=2, services=10, timeline=8
+- Important nodes: Incident `incident:medium_queue_autoscaling_regression_2026_03_18`, Service `service:analytics-writer`, Service `service:dedup-cache`, Service `service:deploy-controller`, Service `service:event-ingestion-consumer`, Service `service:kafka-broker`, Service `service:notification-autoscaler`, Service `service:notification-worker`
+- Graph relationships: OBSERVED_IN (42), OBSERVED_ON (26), OCCURRED_AFTER (10), RECOMMENDS (6), REFERENCES (6), DEPENDS_ON (5), CHANGED (4), INCLUDED_IN (3)
+
+## Hypothesis Evaluation
+- Supported: None
+- Ruled out: None
+- Considered: hot shard after tenant migration (no direct evidence refs); provider delivery slowdown (no direct evidence refs); queue autoscaling regression (no direct evidence refs); worker CPU saturation (no direct evidence refs)
+
+## Root Cause Analysis
+- RCA: Unable to parse a grounded root cause from the model output.
+- Citations: None
+- Recommended actions: Not provided
+- Warnings: The RCA draft did not include any citations.
+
+  

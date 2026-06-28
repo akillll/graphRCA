@@ -7,6 +7,8 @@ inside the service layer.
 
 from __future__ import annotations
 
+import logging
+
 from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
 
@@ -16,6 +18,7 @@ from api.types import ApiErrorResponse, InvestigateRequest, InvestigateResponse
 
 
 router = APIRouter(tags=["investigation"])
+logger = logging.getLogger(__name__)
 
 
 def _build_service() -> InvestigationService:
@@ -47,12 +50,14 @@ def investigate(request: InvestigateRequest) -> InvestigateResponse | JSONRespon
     try:
         return service.investigate(request)
     except ApiError as exc:
+        logger.warning("Investigation API error: %s details=%s", exc.message, exc.details)
         error_response = to_error_response(exc)
         return JSONResponse(
             status_code=exc.status_code,
             content=error_response.model_dump(),
         )
-    except Exception:
+    except Exception as exc:
+        logger.exception("Unexpected investigation failure", exc_info=exc)
         error = UnexpectedApiError("Unexpected API failure during investigation.")
         error_response = to_error_response(error)
         return JSONResponse(

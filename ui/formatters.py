@@ -88,7 +88,15 @@ class InvestigationFormatter:
         evidence_counts = summary.get("evidence_counts")
         counts = evidence_counts if isinstance(evidence_counts, dict) else {}
         important_nodes = self._important_evidence_nodes(response)
-        readable_relationships = self._readable_relationships(response.hypotheses)
+        graph_relationships = summary.get("graph_relationships")
+        if isinstance(graph_relationships, list):
+            readable_relationships = [
+                str(item).strip()
+                for item in graph_relationships
+                if str(item).strip()
+            ]
+        else:
+            readable_relationships = self._readable_relationships(response.hypotheses)
 
         lines = [
             "## Evidence Summary",
