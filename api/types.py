@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import Field
 
@@ -27,9 +27,16 @@ class InvestigateResponse(PromptBaseModel):
     question: NonEmptyString
     incident_id: NonEmptyString
     answer: NonEmptyString
+    question_resolution: dict[str, JsonValue] | None = None
     evidence_nodes: list[EvidenceRecord] = Field(default_factory=list)
     hypotheses: list[EvidenceRecord] = Field(default_factory=list)
     citations: list[RcaCitation] = Field(default_factory=list)
+    evidence_summary: list[NonEmptyString] = Field(default_factory=list)
+    supported_hypotheses: list[NonEmptyString] = Field(default_factory=list)
+    ruled_out_hypotheses: list[NonEmptyString] = Field(default_factory=list)
+    recommended_actions: list[NonEmptyString] = Field(default_factory=list)
+    confidence: Literal["low", "medium", "high"]
+    confidence_rationale: NonEmptyString
     traversal_summary: dict[str, JsonValue] | None = None
     warnings: list[str] = Field(default_factory=list)
 

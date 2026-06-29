@@ -1038,7 +1038,7 @@ This improves scoring but must remain outside runtime ingestion.
 
 ## Scope Controls
 
-For the weekend build:
+For the current local build:
 
 - implement deterministic ingestion first
 - use LLM-assisted extraction only where it visibly improves hypothesis support/rule-out or runbook/log matching

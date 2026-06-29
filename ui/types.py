@@ -49,6 +49,9 @@ class UiHypothesis(PromptBaseModel):
     ruling_out_evidence_ids: list[NonEmptyString] = Field(default_factory=list)
     support_edge_types: list[NonEmptyString] = Field(default_factory=list)
     rule_out_edge_types: list[NonEmptyString] = Field(default_factory=list)
+    support_score: float | None = None
+    rule_out_score: float | None = None
+    reason_codes: list[NonEmptyString] = Field(default_factory=list)
     investigation_outcome: Literal["supported", "ruled_out", "considered"] = "considered"
 
 
@@ -70,9 +73,16 @@ class UiInvestigateResponse(PromptBaseModel):
     question: NonEmptyString
     incident_id: NonEmptyString
     answer: NonEmptyString
+    question_resolution: dict[str, JsonValue] | None = None
     evidence_nodes: list[EvidenceRecord] = Field(default_factory=list)
     hypotheses: list[UiHypothesis] = Field(default_factory=list)
     citations: list[UiCitation] = Field(default_factory=list)
+    evidence_summary: list[NonEmptyString] = Field(default_factory=list)
+    supported_hypotheses: list[NonEmptyString] = Field(default_factory=list)
+    ruled_out_hypotheses: list[NonEmptyString] = Field(default_factory=list)
+    recommended_actions: list[NonEmptyString] = Field(default_factory=list)
+    confidence: Literal["low", "medium", "high"]
+    confidence_rationale: NonEmptyString
     traversal_summary: dict[str, JsonValue] | None = None
     warnings: list[UiWarning] = Field(default_factory=list)
 

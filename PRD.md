@@ -3,22 +3,22 @@
 ## GraphRAG-Powered Incident Root Cause Analysis System
 
 **Version:** 1.1  
-**Status:** Working local assessment prototype; benchmark-first, not production-ready  
-**Target Build Window:** Weekend assessment  
+**Status:** Working local prototype; benchmark-first, not production-ready  
+**Target Build Window:** Focused local build  
 **Hardware Target:** MacBook Air M1, 8GB RAM  
 **Primary Graph Contract:** `GRAPH_SPEC.md`
 
 ## 1. Overview
 
-### 1.0 Assessment Positioning
+### 1.0 Product Positioning
 
-GraphRCA was built as an FDE assessment project for a GraphRAG task using a local LLM and `llama.cpp`.
+GraphRCA is a local GraphRAG project built around evidence-backed incident RCA using a local LLM and `llama.cpp`.
 
 The current system should be understood as:
 
 - a benchmark-driven local GraphRAG prototype
 - a replayable investigation system over a fixed synthetic dataset
-- a demonstration of graph-first retrieval, evidence aggregation, and local RCA generation
+- a working demonstration of graph-first retrieval, evidence aggregation, and local RCA generation
 
 The current system should not be understood as:
 
@@ -79,7 +79,7 @@ Runtime answers must be generated from:
 - Generate RCA responses with node-level citations.
 - Make hypothesis support and elimination visible.
 - Evaluate against benchmark ground truth without leaking ground truth into runtime.
-- Demonstrate benchmark-oriented GraphRAG design clearly enough for assessment review by an engineering leader.
+- Demonstrate a benchmark-oriented GraphRAG design clearly enough to inspect retrieval quality, evidence handling, and RCA generation.
 
 ### 2.2 Non-Goals
 
@@ -216,11 +216,11 @@ Implementation must follow these principles:
 | Local LLM | llama.cpp, small quantized model | Runs locally on M1 hardware |
 | Backend | FastAPI | Simple API and OpenAPI support |
 | UI | Chainlit | Step-based investigation display |
-| Runtime | local Python processes | Minimal local assessment setup |
+| Runtime | local Python processes | Minimal local setup |
 
 ### 5.2 Current Codebase Layout
 
-The following structure is a good fit for the weekend build because it separates deterministic parsing, LLM-assisted enrichment, graph retrieval, prompt construction, API wiring, and offline evaluation without introducing too many layers:
+The following structure is a good fit for the current local build because it separates deterministic parsing, LLM-assisted enrichment, graph retrieval, prompt construction, API wiring, and offline evaluation without introducing too many layers:
 
 ```text
 graphRCA/
@@ -246,7 +246,7 @@ Responsibilities:
 - `ingestion/deterministic/`: parse source files into canonical nodes and deterministic edges
 - `ingestion/llm/`: planned semantic extraction that adds provenance-tagged nodes or edges
 - `retrieval/`: Neo4j access, Cypher queries, semantic incident resolution, graph traversal, deterministic hypothesis scoring, and evidence assembly
-- `prompting/`: structured prompt builders for entity extraction and RCA generation
+- `prompting/`: structured prompt builders and RCA generation
 - `api/`: FastAPI routes, response schemas, and app wiring
 - `ui/`: Chainlit investigation display over the backend API
 
@@ -392,14 +392,26 @@ Response:
 
 ```json
 {
+  "question": "Why did catalog-api latency spike on April 21?",
+  "incident_id": "incident:easy_cache_warmup_regression_2026_04_21",
   "answer": "...",
-  "traversal_path": [],
-  "evidence_nodes": [],
-  "hypotheses": {
-    "supported": [],
-    "ruled_out": []
+  "question_resolution": {
+    "selected_incident_id": "incident:easy_cache_warmup_regression_2026_04_21",
+    "scope_classification": "in_scope",
+    "scope_reason": "...",
+    "matched_terms": []
   },
-  "citations": []
+  "evidence_nodes": [],
+  "hypotheses": [],
+  "citations": [],
+  "evidence_summary": [],
+  "supported_hypotheses": [],
+  "ruled_out_hypotheses": [],
+  "recommended_actions": [],
+  "confidence": "high",
+  "confidence_rationale": "...",
+  "traversal_summary": {},
+  "warnings": []
 }
 ```
 
@@ -413,23 +425,25 @@ Returns the incident-centered evidence subgraph for UI display and debugging.
 
 ## 9. Chainlit UI Requirements
 
-The UI should show four visible investigation steps:
+The UI should show the RCA directly and keep the investigation trace easy to inspect:
 
-1. **Entities extracted**
-   - incident ID, service names, symptoms, time references
+1. **RCA**
+   - final answer
+   - confidence rationale
+   - recommended actions when supported
 
-2. **Graph traversal**
-   - readable path or neighborhood summary with node IDs and edge types
+2. **Question resolution**
+   - selected incident
+   - extracted clues such as services, symptoms, and time references
+   - candidate resolution context
 
-3. **Hypothesis evaluation**
+3. **Evidence neighborhood**
+   - readable neighborhood summary with node counts, edge counts, key evidence, and citations
+
+4. **Hypothesis evaluation**
    - supported hypotheses
    - ruled-out hypotheses
-   - evidence citations for each
-
-4. **RCA generation**
-   - final answer
-   - evidence trail
-   - recommended actions when supported
+   - evidence references for each
 
 The UI should optimize for clarity of investigation, not visual polish.
 
@@ -538,9 +552,9 @@ Runtime effect:
 
 This field must remain evaluation-only.
 
-## 12. Weekend Build Plan
+## 12. Implementation Roadmap
 
-This section describes the intended assessment build plan. Some phases are now implemented in the repo, while others remain partial or deferred.
+This section describes the implementation phases. Some are already in place in the repo, while others remain partial or deferred.
 
 ### Phase 0 - Scaffold
 
@@ -590,7 +604,7 @@ Current repo status:
 - `POST /investigate`
 - `GET /graph/stats`
 - `GET /graph/incident/{incident_id}`
-- Chainlit four-step investigation display.
+- Chainlit RCA-first display with supporting investigation sections.
 
 ### Phase 6 - Evaluation and README
 
@@ -609,7 +623,7 @@ Current repo status:
 | Risk | Likelihood | Mitigation |
 |---|---|---|
 | Dataset lacks topology for hard incidents | High | Add optional `services.json`; otherwise fall back to `affected_services` without dependency direction |
-| Commit-to-deployment mapping is ambiguous | Medium | Label as incident-window association unless `commit_ids` are added |
+| Commit-to-deployment mapping is incomplete in some fixtures | Medium | Use deterministic `commit_ids` when present and avoid overclaiming exact release membership when absent |
 | LLM extraction produces malformed JSON | Medium | Validate schema, retry, and continue with deterministic graph |
 | Local llama.cpp is slow | Medium | Use compact context, cache repeated queries, keep model small |
 | Confidence scoring is deferred | Low | Exclude it from initial implementation and benchmark reporting |
@@ -617,7 +631,7 @@ Current repo status:
 
 ## 14. Definition of Done
 
-The assessment is successful when:
+The project is in a good working state when:
 
 - docs match the actual dataset
 - docs make clear that this is a benchmark-oriented local prototype, not a production system

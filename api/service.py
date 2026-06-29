@@ -14,6 +14,7 @@ from api.errors import (
     IncidentNotFoundError,
     ModelUnavailableError,
     PromptingFailedError,
+    QuestionOutOfScopeError,
     UnexpectedApiError,
 )
 from api.types import InvestigateRequest, InvestigateResponse
@@ -32,6 +33,7 @@ from retrieval.entity_extractor import EntityExtractor
 from retrieval.hypothesis_scoring import build_evidence_summary, compose_root_cause, score_hypotheses
 from retrieval.incident_index import build_incident_semantic_index
 from retrieval.resolution import IncidentResolver
+from retrieval.scope_guard import QuestionScopeGuard, ScopeAssessment
 from retrieval.traversal import IncidentTraversal
 from retrieval.types import EvidenceBundle, IncidentCandidate, TraversalResult
 
@@ -46,6 +48,7 @@ class InvestigationService:
     extractor: EntityExtractor | None = None
     resolver: IncidentResolver | None = None
     traversal: IncidentTraversal | None = None
+    scope_guard: QuestionScopeGuard | None = None
     assembler: EvidenceAssembler = field(default_factory=EvidenceAssembler)
     prompt_generator: PromptGenerator | None = None
 
@@ -82,6 +85,12 @@ class InvestigationService:
         if self.traversal is None:
             self.traversal = IncidentTraversal(self.graph_client)
 
+        if self.scope_guard is None:
+            self.scope_guard = QuestionScopeGuard(
+                known_services=known_services,
+                known_incident_ids=known_incident_ids,
+            )
+
         if self.prompt_generator is None:
             self.prompt_generator = PromptGenerator(
                 llama_client=LlamaCppClient(
@@ -98,6 +107,24 @@ class InvestigationService:
 
         try:
             entities = self.extractor.extract(question)
+            scope_assessment = self.scope_guard.assess(
+                question,
+                entities,
+                incident_id=request.incident_id,
+            )
+            if scope_assessment.classification == "out_of_scope":
+                raise QuestionOutOfScopeError(
+                    "GraphRCA only handles evidence-based incident investigation questions about the benchmark dataset.",
+                    details={
+                        "classification": scope_assessment.classification,
+                        "reason": scope_assessment.reason,
+                        "matched_terms": list(scope_assessment.matched_terms),
+                        "suggestion": (
+                            "Ask about a benchmark incident, service, symptom, deployment, or date, "
+                            'for example: "Why did checkout-api time out on March 7?"'
+                        ),
+                    },
+                )
             candidates: list[IncidentCandidate] = []
 
             if request.incident_id and request.incident_id.strip():
@@ -115,11 +142,19 @@ class InvestigationService:
                 selected_incident_id=traversal_result.incident_id,
                 candidates=candidates,
                 entities=entities,
+                scope_assessment=scope_assessment,
                 traversal_result=traversal_result,
                 evidence_bundle=evidence_bundle,
                 rca_draft=rca_draft,
             )
-        except (BadRequestError, IncidentNotFoundError, GraphUnavailableError, ModelUnavailableError, PromptingFailedError):
+        except (
+            BadRequestError,
+            IncidentNotFoundError,
+            GraphUnavailableError,
+            ModelUnavailableError,
+            PromptingFailedError,
+            QuestionOutOfScopeError,
+        ):
             raise
         except Exception as exc:  # pragma: no cover - defensive normalization
             raise UnexpectedApiError("Unexpected API failure during investigation.") from exc
@@ -232,6 +267,7 @@ class InvestigationService:
         selected_incident_id: str,
         candidates: list[IncidentCandidate],
         entities,
+        scope_assessment: ScopeAssessment,
         traversal_result: TraversalResult,
         evidence_bundle: EvidenceBundle,
         rca_draft: RcaDraft,
@@ -250,9 +286,21 @@ class InvestigationService:
             question=request.question,
             incident_id=selected_incident_id,
             answer=rca_draft.root_cause,
+            question_resolution=_question_resolution(
+                entities=entities,
+                candidates=candidates,
+                selected_incident_id=selected_incident_id,
+                scope_assessment=scope_assessment,
+            ),
             evidence_nodes=_evidence_node_summaries(traversal_result),
             hypotheses=_response_hypotheses(evidence_bundle, rca_draft),
             citations=[citation.model_dump() for citation in rca_draft.citations],
+            evidence_summary=list(rca_draft.evidence_summary),
+            supported_hypotheses=list(rca_draft.supported_hypotheses),
+            ruled_out_hypotheses=list(rca_draft.ruled_out_hypotheses),
+            recommended_actions=list(rca_draft.recommended_actions),
+            confidence=_confidence_level(evidence_bundle, rca_draft),
+            confidence_rationale=_confidence_rationale(evidence_bundle, rca_draft),
             traversal_summary=_traversal_summary(
                 entities=entities,
                 candidates=candidates,
@@ -294,6 +342,7 @@ def _response_hypotheses(evidence_bundle: EvidenceBundle, rca_draft: RcaDraft) -
             "rule_out_score": item.rule_out_score,
             "support_records": item.support_records,
             "rule_out_records": item.rule_out_records,
+            "reason_codes": item.reason_codes,
         }
         for item in scoring_report.hypotheses
     }
@@ -325,6 +374,9 @@ def _response_hypotheses(evidence_bundle: EvidenceBundle, rca_draft: RcaDraft) -
                 record.get("rule_out_edge_types", []),
                 ["DETERMINISTIC_RULE_OUT"] if rule_out_records else [],
             ),
+            "support_score": round(float(analysis.get("support_score", 0.0)), 3),
+            "rule_out_score": round(float(analysis.get("rule_out_score", 0.0)), 3),
+            "reason_codes": list(analysis.get("reason_codes", [])),
         }
         if hypothesis_text in supported:
             payload["investigation_outcome"] = "supported"
@@ -526,6 +578,76 @@ def _graph_relationship_summaries(traversal_result: TraversalResult) -> list[str
         counts[relationship_type] = counts.get(relationship_type, 0) + 1
     ordered = sorted(counts.items(), key=lambda item: (-item[1], item[0]))
     return [f"{relationship_type} ({count})" for relationship_type, count in ordered[:8]]
+
+
+def _question_resolution(
+    *,
+    entities,
+    candidates: list[IncidentCandidate],
+    selected_incident_id: str,
+    scope_assessment: ScopeAssessment,
+) -> dict[str, Any]:
+    """Return the always-visible question resolution summary for the UI."""
+    return {
+        "selected_incident_id": selected_incident_id,
+        "scope_classification": scope_assessment.classification,
+        "scope_reason": scope_assessment.reason,
+        "matched_terms": list(scope_assessment.matched_terms),
+        "extracted_entities": {
+            "incident_ids": list(entities.incident_ids),
+            "services": list(entities.services),
+            "symptoms": list(entities.symptoms),
+            "time_references": list(entities.time_references),
+            "operational_terms": list(entities.operational_terms),
+        },
+        "incident_candidates": [
+            {
+                "incident_id": candidate.incident_id,
+                "score": candidate.score,
+                "reasons": list(candidate.reasons),
+            }
+            for candidate in candidates[:3]
+        ],
+    }
+
+
+def _confidence_level(evidence_bundle: EvidenceBundle, rca_draft: RcaDraft) -> str:
+    """Return a conservative evidence-backed confidence level."""
+    corroborating_sources = _corroborating_source_count(evidence_bundle)
+    citation_count = len(rca_draft.citations)
+    ruled_out_count = len([item for item in rca_draft.ruled_out_hypotheses if item.strip()])
+
+    if corroborating_sources >= 4 and citation_count >= 3 and ruled_out_count >= 1:
+        return "high"
+    if corroborating_sources >= 2 and citation_count >= 2:
+        return "medium"
+    return "low"
+
+
+def _confidence_rationale(evidence_bundle: EvidenceBundle, rca_draft: RcaDraft) -> str:
+    """Explain the confidence level using evidence completeness rather than tone."""
+    corroborating_sources = _corroborating_source_count(evidence_bundle)
+    citation_count = len(rca_draft.citations)
+    ruled_out_count = len([item for item in rca_draft.ruled_out_hypotheses if item.strip()])
+    return (
+        f"Confidence is based on {corroborating_sources} corroborating evidence source types, "
+        f"{citation_count} citations, and {ruled_out_count} explicitly ruled-out competing hypotheses."
+    )
+
+
+def _corroborating_source_count(evidence_bundle: EvidenceBundle) -> int:
+    """Count how many distinct evidence source groups contributed non-empty records."""
+    groups = (
+        evidence_bundle.deployments,
+        evidence_bundle.commits,
+        evidence_bundle.metrics,
+        evidence_bundle.logs,
+        evidence_bundle.timeline,
+        evidence_bundle.services,
+        evidence_bundle.configurations,
+        evidence_bundle.runbooks,
+    )
+    return sum(1 for group in groups if group)
 
 
 

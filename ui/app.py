@@ -85,17 +85,16 @@ class UiApplication:
         await self._render_investigation(formatted)
 
     async def _render_investigation(self, formatted: FormattedInvestigation) -> None:
-        """Render the four investigation sections as visible Chainlit steps."""
+        """Render the RCA directly and keep technical sections in Chainlit steps."""
+        await cl.Message(content=formatted.root_cause_analysis).send()
+
         for title, content in (
-            ("Incident Resolution", formatted.incident_resolution),
-            ("Evidence Summary", formatted.evidence_summary),
+            ("Question Resolution", formatted.question_resolution),
+            ("Evidence Neighborhood", formatted.evidence_neighborhood),
             ("Hypothesis Evaluation", formatted.hypothesis_evaluation),
-            ("Root Cause Analysis", formatted.root_cause_analysis),
         ):
             with cl.Step(name=title, type="run") as step:
                 step.output = content
-
-        await cl.Message(content=formatted.markdown).send()
 
 
 _APP = UiApplication()
@@ -124,6 +123,11 @@ def _response_error_message(error: UiApiResponseError) -> str:
     backend_reason = _backend_error_reason(error.details)
     if error.error_code == "incident_not_found":
         return "No matching incident was found for that question. Try a more specific incident, service, or date reference."
+    if error.error_code == "question_out_of_scope":
+        return (
+            "GraphRCA only handles evidence-based investigation questions about the benchmark incident dataset. "
+            'Ask about an incident, service, symptom, deployment, or date, for example: "Why did checkout-api time out on March 7?"'
+        )
     if error.error_code == "graph_unavailable":
         return "The graph backend is unavailable. Check Neo4j connectivity and try again."
     if error.error_code == "model_unavailable":

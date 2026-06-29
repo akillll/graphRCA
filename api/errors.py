@@ -44,6 +44,13 @@ class IncidentNotFoundError(ApiError):
     default_status_code = 404
 
 
+class QuestionOutOfScopeError(ApiError):
+    """Raised when a question does not belong to the GraphRCA investigation scope."""
+
+    error = "question_out_of_scope"
+    default_status_code = 422
+
+
 class GraphUnavailableError(ApiError):
     """Raised when the graph backend cannot be reached or queried."""
 
@@ -95,6 +102,7 @@ __all__ = [
     "IncidentNotFoundError",
     "ModelUnavailableError",
     "PromptingFailedError",
+    "QuestionOutOfScopeError",
     "UnexpectedApiError",
     "to_error_response",
 ]

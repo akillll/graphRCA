@@ -1,14 +1,19 @@
-# Welcome to Chainlit! 🚀🤖
+# GraphRCA
 
-Hi there, Developer! 👋 We're excited to have you on board. Chainlit is a powerful tool designed to help you prototype, debug and share applications built on top of LLMs.
+GraphRCA investigates benchmark incidents using graph-backed evidence retrieval and grounded RCA generation.
 
-## Useful Links 🔗
+Ask questions about:
 
-- **Documentation:** Get started with our comprehensive [Chainlit Documentation](https://docs.chainlit.io) 📚
-- **Discord Community:** Join our friendly [Chainlit Discord](https://discord.gg/k73SQ3FyUh) to ask questions, share your projects, and connect with other developers! 💬
+- incident symptoms
+- services
+- deployments
+- dates and timelines
+- likely root causes
 
-We can't wait to see what you create with Chainlit! Happy coding! 💻😊
+Examples:
 
-## Welcome screen
+- `Why did catalog-api latency spike on April 21?`
+- `What caused the distributed timeout chain in checkout on March 7?`
+- `Which evidence supports the reconnect storm hypothesis?`
 
-To modify the welcome screen, edit the `chainlit.md` file at the root of your project. If you do not want a welcome screen, just leave this file empty.
+Out-of-domain questions will be rejected so the investigation flow stays scoped to the benchmark dataset.

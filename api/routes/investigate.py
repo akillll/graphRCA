@@ -31,6 +31,7 @@ def _build_service() -> InvestigationService:
     response_model=InvestigateResponse,
     responses={
         400: {"model": ApiErrorResponse, "description": "Invalid investigation request."},
+        422: {"model": ApiErrorResponse, "description": "Question is outside the GraphRCA investigation scope."},
         404: {"model": ApiErrorResponse, "description": "Incident could not be found."},
         502: {"model": ApiErrorResponse, "description": "Prompt generation or parsing failed."},
         503: {"model": ApiErrorResponse, "description": "Graph or model backend is unavailable."},

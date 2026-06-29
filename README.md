@@ -22,12 +22,18 @@ This repository is intentionally built as a benchmark-first assessment system, n
 - Incident resolution using exact plus semantic query matching
 - Incident-centered graph traversal and evidence assembly
 - Hypothesis support/rule-out analysis with deterministic fallback scoring
-- FastAPI API and Chainlit UI over a local `llama.cpp` server
+- FastAPI API and Chainlit UI over a local `llama.cpp` server using `Llama-3.2-1B-Instruct-Q4_K_M.gguf`
 
 ## Current Limits
 
 - This project currently relies on graph-first retrieval plus lightweight semantic incident resolution, not full embedding-backed semantic search across all evidence.
 - Richer semantic retrieval is a future-scope improvement. During development, the target machine was a MacBook Air M1 running a local 1B-parameter model via `llama.cpp`, so the implementation favored deterministic graph retrieval and compact local reasoning over heavier retrieval infrastructure.
+- This was built in a tight 3-day window, so the priority was graph correctness, evidence traceability, and hypothesis transparency over deeper production hardening, broader regression coverage, or infrastructure polish.
+
+## Related Documents
+
+- [PRD.md](/Users/aivantatechnologies/Desktop/Code/graphRCA/PRD.md)
+- [questions.txt](/Users/aivantatechnologies/Desktop/Code/graphRCA/questions.txt)
 
 ## Prerequisites
 
@@ -38,7 +44,13 @@ This repository is intentionally built as a benchmark-first assessment system, n
 
 ## Environment
 
-Add these values to `.env`:
+Start from the example file:
+
+```bash
+cp .env.example .env
+```
+
+Then update the values in `.env` for your local Neo4j and `llama-server` setup:
 
 ```env
 APP_NAME=GraphRCA API
@@ -110,6 +122,53 @@ Open:
 http://localhost:8001
 ```
 
+## Docker Compose
+
+If `llama.cpp` is already set up on your machine and `llama-server` is running separately, you can use Docker Compose for the app layer. This setup assumes Neo4j is already running somewhere you can reach it, and Compose will run ingestion first before starting the API and Chainlit.
+
+```bash
+docker compose up --build
+```
+
+If your Docker install exposes the classic Compose binary instead, use:
+
+```bash
+docker-compose up --build
+```
+
+This flow does three things:
+
+- runs deterministic ingestion into your existing Neo4j instance
+- FastAPI on `http://localhost:8000`
+- Chainlit on `http://localhost:8001`
+
+Default Docker settings:
+
+- Neo4j user: `neo4j`
+- Neo4j password: `graphRCApassword`
+- Neo4j URI: `bolt://host.docker.internal:7687`
+- Llama endpoint: `http://host.docker.internal:8080/v1/chat/completions`
+
+This Compose file does not start Neo4j itself. The assumption is that Neo4j is already running, whether through Docker Desktop, a local CLI process, or another local setup.
+
+If your local `llama-server` is reachable through a different host alias under Colima, override it when starting Compose:
+
+```bash
+LLAMA_BASE_URL=http://host.lima.internal:8080/v1/chat/completions docker compose up --build
+```
+
+You can also override the Neo4j password the same way:
+
+```bash
+NEO4J_PASSWORD=your_password docker compose up --build
+```
+
+If Neo4j is also exposed through a different host alias under Colima, override that too:
+
+```bash
+NEO4J_URI=bolt://host.lima.internal:7687 docker compose up --build
+```
+
 ## Basic API Checks
 
 Health:
@@ -154,10 +213,10 @@ Why did catalog-api latency spike on April 21?
 
 The UI should render:
 
-- Incident Resolution
-- Evidence Summary
-- Hypothesis Evaluation
-- Root Cause Analysis
+- RCA as the main visible response
+- Question Resolution in a collapsible section
+- Evidence Neighborhood in a collapsible section
+- Hypothesis Evaluation in a collapsible section
 
 ## Sample Questions
 
@@ -168,6 +227,21 @@ These are good benchmark-style questions to try from the UI or API:
 - What caused image processing backlog and worker restarts on May 22?
 - Why were notification delays limited to only some tenants on March 18?
 - What caused the distributed timeout chain in checkout on March 7?
+
+For a broader curated test set, see [questions.txt](/Users/aivantatechnologies/Desktop/Code/graphRCA/questions.txt).
+
+## Future Scope
+
+- Add lightweight conversation context so follow-up questions can stay grounded in the same investigation instead of starting from scratch every time.
+- Add some practical request limits so the API and UI stay stable if the system gets heavier use.
+- Add basic auth and access controls before treating this as something more than a local benchmark project.
+- Add better logging and request tracing so investigations are easier to replay and debug later.
+- Tighten input handling and prompt boundaries so the system is more resilient to messy or adversarial inputs.
+- Improve secrets and config handling so local setup is safer and logs do not leak sensitive values.
+- Add a more production-aware deployment layer with better defaults around transport security and trusted access.
+- Add a few guardrails around timeouts, concurrency, and resource usage so Neo4j and the local model fail more predictably under load.
+- Add richer semantic retrieval, reranking, and evaluation once the graph-first baseline feels stable enough.
+- Try a stronger local model for better RCA quality if hardware allows, since the current setup was tuned around lightweight local inference on constrained hardware.
 
 ## Troubleshooting
 
