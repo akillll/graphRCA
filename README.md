@@ -71,6 +71,28 @@ UI_INVESTIGATE_ENDPOINT=/investigate
 UI_REQUEST_TIMEOUT_SECONDS=120
 ```
 
+## Quickstart
+
+If Neo4j and `llama-server` are already running locally, the fastest setup path after cloning is:
+
+```bash
+python3 make.py setup
+```
+
+That command will:
+
+- create `venv/` if needed
+- install Python dependencies
+- create `.env` from `.env.example` if needed
+- run deterministic ingestion into Neo4j
+
+After that, start the app in two terminals:
+
+```bash
+python3 make.py api
+python3 make.py ui
+```
+
 ## Install Dependencies
 
 ```bash
@@ -89,7 +111,7 @@ Use three terminals.
 ```bash
 source venv/bin/activate
 ./build/bin/llama-server \
-  -m "/Users/aivantatechnologies/Desktop/Code/graphRCA/llm model/Llama-3.2-1B-Instruct-Q4_K_M.gguf" \
+  -m "/graphRCA/llm model/Llama-3.2-1B-Instruct-Q4_K_M.gguf" \
   -c 16384 \
   -ngl 99 \
   --host 127.0.0.1 \
@@ -122,51 +144,30 @@ Open:
 http://localhost:8001
 ```
 
-## Docker Compose
+## Local Commands
 
-If `llama.cpp` is already set up on your machine and `llama-server` is running separately, you can use Docker Compose for the app layer. This setup assumes Neo4j is already running somewhere you can reach it, and Compose will run ingestion first before starting the API and Chainlit.
+If Neo4j and `llama-server` are already running locally, the recommended workflow is through `make.py`.
+
+First-time setup:
 
 ```bash
-docker compose up --build
+python3 make.py setup
 ```
 
-If your Docker install exposes the classic Compose binary instead, use:
+That will:
+
+- create `venv/` if needed
+- install dependencies
+- create `.env` from `.env.example` if needed
+- run deterministic ingestion into Neo4j
+
+Day-to-day commands:
 
 ```bash
-docker-compose up --build
-```
-
-This flow does three things:
-
-- runs deterministic ingestion into your existing Neo4j instance
-- FastAPI on `http://localhost:8000`
-- Chainlit on `http://localhost:8001`
-
-Default Docker settings:
-
-- Neo4j user: `neo4j`
-- Neo4j password: `graphRCApassword`
-- Neo4j URI: `bolt://host.docker.internal:7687`
-- Llama endpoint: `http://host.docker.internal:8080/v1/chat/completions`
-
-This Compose file does not start Neo4j itself. The assumption is that Neo4j is already running, whether through Docker Desktop, a local CLI process, or another local setup.
-
-If your local `llama-server` is reachable through a different host alias under Colima, override it when starting Compose:
-
-```bash
-LLAMA_BASE_URL=http://host.lima.internal:8080/v1/chat/completions docker compose up --build
-```
-
-You can also override the Neo4j password the same way:
-
-```bash
-NEO4J_PASSWORD=your_password docker compose up --build
-```
-
-If Neo4j is also exposed through a different host alias under Colima, override that too:
-
-```bash
-NEO4J_URI=bolt://host.lima.internal:7687 docker compose up --build
+python3 make.py ingest
+python3 make.py api
+python3 make.py ui
+python3 make.py doctor
 ```
 
 ## Basic API Checks

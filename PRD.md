@@ -297,7 +297,7 @@ Not yet implemented end to end:
 - LLM-assisted ingestion enrichment
 - robust vector retrieval or embedding-backed enrichment
 - formal offline benchmark runner under a dedicated `evaluation/` package
-- production deployment packaging such as Docker Compose in this repository
+- production deployment packaging in this repository
 
 ## 6. Ingestion Requirements
 
